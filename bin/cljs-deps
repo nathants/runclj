@@ -1,23 +1,29 @@
 #!/usr/bin/env python2.7
 import sys
-import collections
+import re
+import edn_format
+
 filepath = sys.argv[1]
 mode = sys.argv[2]
-vals = collections.defaultdict(list)
-def parse_dep(line):
-    _, name, version = line.replace('(', '').replace(')', '').replace('"', '').split()
-    return '[%(name)s "%(version)s"]' % locals()
-def parse_require(line):
-    return line.replace('(require', '').replace(')', '').replace('"', '').strip()
 
 with open(filepath) as f:
-    for line in f:
-        if line.strip().startswith('(require-npm '):
-            vals['npms'].append(parse_dep(line))
-        elif line.strip().startswith('(require-lein '):
-            vals['leins'].append(parse_dep(line))
-        elif line.strip().startswith('(require '):
-            vals['requires'].append(parse_require(line))
-
-for val in vals[mode]:
-    print(val)
+    lines = f.read().splitlines()
+lines = [re.sub('#_', '', line) for line in lines]
+for i in range(10000):
+    i += 1
+    try:
+        ns = edn_format.loads('\n'.join(lines[:i]))
+        break
+    except:
+        pass
+else:
+    assert False, 'failed to parse ns'
+for xs in ns[2:]:
+    name = getattr(xs[0], 'name', '')
+    if mode == 'source':
+        print '\n'.join(lines[i:])
+        break
+    elif mode == name:
+        for y in xs[1:]:
+            print edn_format.dumps(y)
+        break

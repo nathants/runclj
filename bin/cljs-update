@@ -11,7 +11,7 @@ cat <<EOF
             [clojure.set :as set]
             [cljs.pprint :as pp]
             [cljs.core.match :refer-macros [match]]
-            $(cljs-deps $filepath requires)
+            $(cljs-deps $filepath require)
   ))
 (def Fiber (js/require "fibers"))
 (defn run-opts
@@ -48,7 +48,7 @@ cat <<EOF
 (nodejs/enable-util-print!)
 (defn -main [& _]
  (.run (Fiber (fn []
-$(cat $filepath)
+$(cljs-deps $filepath source)
 ))))
 (set! *main-cli-fn* -main)
 EOF

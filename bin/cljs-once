@@ -2,8 +2,8 @@
 set -e
 filepath=$1
 root=$(cljs-root $filepath)
-srchash=$(cljs-hash $filepath)
-if [ "$srchash" != "$(cat $root/hash 2>/dev/null || echo '')" ]; then
+if [ "$(cljs-hash $filepath)" != "$(cat $root/hash 2>/dev/null || echo '')" ]; then
+    cljs-update $filepath
     cd $root
     lein npm install
 
@@ -12,11 +12,9 @@ if [ "$srchash" != "$(cat $root/hash 2>/dev/null || echo '')" ]; then
     tail -f $root/compiler.log| while read line; do
         echo $line
         if echo $line |grep 'Successfully compiled' >/dev/null; then
-            echo "all done!"
             kill $!
             pkill -P $$ tail
             exit 0
         fi
     done
-
 fi

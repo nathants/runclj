@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+filepath=$1
+cljs-make-proj $filepath
+cljs-update $filepath
+cd $(cljs-root $filepath)
+lein npm install
+lein trampoline repl :headless
+
+# TODO with this https://github.com/cemerick/piggieback/issues/61 is
+# fixed, we can have cljs-repl replace cljs-auto-*, which would be
+# nice.

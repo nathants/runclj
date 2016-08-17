@@ -3,10 +3,8 @@ set -e
 filepath=$1
 root=$(cljs-root $filepath)
 pid=$(cat $root/cljs-auto.pid 2>/dev/null || echo "")
-echo $filepath > $root/filepath
 cljs-make-proj $filepath
-cljs-update $filepath
-echo subtract 40 lines from source-map line number because of code added with cljs-update 1>&2
+# echo subtract TODO num lines from source-map line number because of code added with cljs-update 1>&2
 if [ ! -z "$pid" ] && ps "$pid" >/dev/null; then
     echo run via: cljs-auto
     cljs-auto-run "$@"

@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 filepath=$1
-pid=$(cat $(cljs-root $filepath)/cljs-auto.pid || echo "")
-if ps $pid >/dev/null; then
+pid=$(cat $(cljs-root $filepath)/cljs-auto.pid 2>/dev/null || echo "")
+if [ ! -z "$pid" ] && ps $pid >/dev/null; then
     echo $pid "running"
     exit 0
 else

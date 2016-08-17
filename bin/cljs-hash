@@ -1,6 +1,4 @@
 #!/bin/bash
 set -e
 filepath=$1
-srcpath=$(cljs-root $filepath)/src/main.cljs
-prjpath=$(cljs-root $filepath)/project.clj
-(cat $prjpath $srcpath 2>/dev/null || echo "") | sha512sum | awk '{print $1}'
+(cat $filepath 2>/dev/null || echo "") | sha512sum | awk '{print $1}'
