@@ -1,0 +1,58 @@
+#!/bin/bash
+set -e
+filepath=$1
+src() {
+cat <<EOF
+(ns main
+  (:require-macros [cljs.core.async.macros :as csp])
+  (:require [cljs.core.async :as csp]
+            [cljs.nodejs :as nodejs]
+            [clojure.string :as s]
+            [clojure.set :as set]
+            [cljs.pprint :as pp]
+            [cljs.core.match :refer-macros [match]]
+            $(cljs-deps $filepath requires)
+  ))
+(def Fiber (js/require "fibers"))
+(defn run-opts
+  [cmd & {:keys [cb]}]
+  (let [fiber (.-current Fiber)
+        cmd (s/join " " (map str cmd))
+        chan (csp/chan)]
+    (println :run cmd)
+    (doto (.spawn (js/require "child_process") "bash" #js ["-c" cmd])
+      (-> .-stdout (.on "data"  #(csp/put! chan [:data (str %)])))
+      (-> .-stderr (.on "data"  #(csp/put! chan [:data (str %)])))
+      (->          (.on "close" #(csp/put! chan [:exit %]))))
+    (csp/go-loop [output ""]
+      (match (csp/<! chan)
+        [:data text] (do (dorun (map (or cb identity) (s/split-lines text)))
+                         (recur (str output text)))
+        [:exit code] (let [val {:exit code
+                                :output (s/trim output)
+                                :cmd cmd
+                                :cwd (.cwd js/process)}]
+                       (if (zero? code)
+                         (.run fiber val)
+                         (.throwInto fiber val)))))
+    (.yield Fiber)))
+(defn require-npm [& _])
+(defn require-lein [& _])
+(defn require [& _])
+(defn run
+  [& cmd]
+  (run-opts cmd))
+(defn run-cb
+  [cb & cmd]
+  (run-opts cmd :cb cb))
+(nodejs/enable-util-print!)
+(defn -main [& _]
+ (.run (Fiber (fn []
+$(cat $filepath)
+))))
+(set! *main-cli-fn* -main)
+EOF
+}
+root=$(cljs-root $filepath)/src
+src > $root/main.cljs.tmp
+mv -f $root/main.cljs.tmp $root/main.cljs

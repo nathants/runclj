@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+filepath=$1
+namehash=$(echo $filepath | basename - | sha512sum | awk '{print $1}')
+echo /tmp/cljs/$namehash

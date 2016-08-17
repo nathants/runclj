@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+filepath=$1
+pid=$(cat $(cljs-root $filepath)/cljs-auto.pid || echo "")
+if ps $pid >/dev/null; then
+    echo $pid "running"
+    exit 0
+else
+    echo "stopped"
+    exit 1
+fi

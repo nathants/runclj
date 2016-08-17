@@ -1,0 +1,47 @@
+#!/bin/bash
+set -e
+filepath=$1
+root=$(cljs-root $filepath)
+
+if [ "$clean" = "true" ]; then
+    rm -rf "$root"
+fi
+
+run(){
+cat <<EOF
+require('source-map-support').install();
+require("$root/out/goog/bootstrap/nodejs");
+require("$root/out/dev.js");
+require("$root/out/main.js");
+global.main._main.apply(this, process.argv.slice(2));
+EOF
+}
+project() {
+cat <<EOF
+(defproject $(basename $filepath) "0.0.1"
+  :dependencies [[org.clojure/clojure "1.9.0-alpha10"]
+                 [org.clojure/clojurescript "1.9.216"]
+                 [org.clojure/core.async "0.2.385"]
+                 [org.clojure/core.match "0.3.0-alpha4"]
+                 $(cljs-deps $filepath leins)
+                ]
+  :plugins [[lein-cljsbuild "1.1.3"]
+            [lein-npm "0.6.2"]]
+  :npm {:dependencies [[source-map-support "0.4.2"]
+                       [fibers "1.0.13"]
+                       $(cljs-deps $filepath npms)
+                      ]}
+  :cljsbuild {:builds [{:source-paths ["src"]
+                        :notify-command ["bash" "-c" "cljs-hash $(pwd)/$filepath >hash"]
+                        :compiler {:output-to "out/dev.js"
+                                   :output-dir "out"
+                                   :source-map true
+                                   :optimizations :none
+                                   :pretty-print true
+                                   :cache-analysis true
+                                   :target :nodejs}}]})
+EOF
+}
+mkdir -p $root/src
+run > $root/run.js
+project > $root/project.clj

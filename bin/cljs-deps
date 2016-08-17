@@ -1,0 +1,23 @@
+#!/usr/bin/env python2.7
+import sys
+import collections
+filepath = sys.argv[1]
+mode = sys.argv[2]
+vals = collections.defaultdict(list)
+def parse_dep(line):
+    _, name, version = line.replace('(', '').replace(')', '').replace('"', '').split()
+    return '[%(name)s "%(version)s"]' % locals()
+def parse_require(line):
+    return line.replace('(require', '').replace(')', '').replace('"', '').strip()
+
+with open(filepath) as f:
+    for line in f:
+        if line.strip().startswith('(require-npm '):
+            vals['npms'].append(parse_dep(line))
+        elif line.strip().startswith('(require-lein '):
+            vals['leins'].append(parse_dep(line))
+        elif line.strip().startswith('(require '):
+            vals['requires'].append(parse_require(line))
+
+for val in vals[mode]:
+    print(val)

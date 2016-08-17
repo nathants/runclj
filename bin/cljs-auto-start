@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+filepath=$1
+cljs-auto-stop $filepath || true
+cljs-make-proj $filepath
+cljs-update $filepath
+cd $(cljs-root $filepath)
+lein npm install
+(lein trampoline cljsbuild auto 2>&1 | tee >(grep --line-buffered 'Successfully compiled' > compiled.log) > compiler.log 2>&1) &
+echo $! > cljs-auto.pid
+cljs-auto-status $filepath

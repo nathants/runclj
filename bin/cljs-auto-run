@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+filepath=$1
+root=$(cljs-root $filepath)
+now=$(ls -l $root/compiled.log)
+tail -n0 -f $root/compiler.log 1>&2 &
+if cljs-update $filepath; then
+    while [ "$now" = "$(ls -l $root/compiled.log)" ]; do
+        sleep .025
+    done
+fi
+kill $!
+shift
+node $root/run.js "$@"

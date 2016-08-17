@@ -1,0 +1,7 @@
+#!/bin/bash
+filepath=$1
+pid=$(cat $(cljs-root $filepath)/cljs-auto.pid || echo "")
+if [ ! -z "$pid" ]; then
+    pkill -P $pid 2>/dev/null
+fi
+cljs-auto-status $filepath
