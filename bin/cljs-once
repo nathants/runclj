@@ -3,21 +3,20 @@ set -e
 filepath=$1
 root=$(cljs-root $filepath)
 if [ "$(cljs-hash $filepath)" != "$(cat $root/hash 2>/dev/null || echo '')" ]; then
-    echo recompiling...
+    echo recompiling... >&2
     cljs-update $filepath
     cd $root
-    lein npm install
-
+    lein npm install >&2
     # because cljsbuild doesnt exit speedily after successful compilation, when it does, drop this
     lein cljsbuild once > $root/compiler.log 2>&1 &
     tail -f $root/compiler.log| while read line; do
         echo $line
-        if echo $line |grep 'Successfully compiled' >/dev/null; then
-            kill $!
-            pkill -P $$ tail
+        if echo $line |grep 'Successfully compiled' >/dev/null 2>&1; then
+            kill $! >&2
+            pkill -P $$ tail >&2
             exit 0
         fi
     done
 else
-    echo using precompiled
+    echo using precompiled >&2
 fi

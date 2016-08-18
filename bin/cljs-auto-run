@@ -3,14 +3,16 @@ set -e
 filepath=$1
 root=$(cljs-root $filepath)
 now=$(cat $root/compiled.log|wc -l)
+tail -n0 -f $root/compiler.log >&2 &
 if cljs-update $filepath; then
     while true; do
         if [ "$now" != "$(cat $root/compiled.log|wc -l)" ]; then
-            tail -n1 $root/compiled.log
+            tail -n1 $root/compiled.log >&2
             break
         fi
         sleep .025
     done
 fi
+kill $!
 shift
 node $root/run.js "$@"

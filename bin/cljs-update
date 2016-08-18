@@ -6,18 +6,16 @@ cat <<EOF
 (ns main
   (:require [shell :as sh]
             [cljs.nodejs :as nodejs]
-            $(cljs-deps $filepath require)))
+            $(cljs-deps $filepath require)
+))
 (nodejs/enable-util-print!)
 (defn -main [& _]
  (.run (sh/Fiber (fn []
-                   $(cljs-deps $filepath source
-)))))
+                   $(cljs-deps $filepath source)
+))))
 (set! *main-cli-fn* -main)
 EOF
 }
 root=$(cljs-root $filepath)/src
 src > $root/main.cljs.tmp
 mv -f $root/main.cljs.tmp $root/main.cljs
-
-# TODO move cljs-update should not modify the file much, put (run) code into a sep file and :require it.
-# TODO run-fiber. can we use (run) in repl? or cli only?
