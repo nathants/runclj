@@ -10,7 +10,7 @@ if [ "$(cljs-hash $filepath)" != "$(cat $root/hash 2>/dev/null || echo '')" ]; t
     # because cljsbuild doesnt exit speedily after successful compilation, when it does, drop this
     lein cljsbuild once > $root/compiler.log 2>&1 &
     tail -f $root/compiler.log| while read line; do
-        echo $line
+        echo $line >&2
         if echo $line |grep 'Successfully compiled' >/dev/null 2>&1; then
             kill $! >&2
             pkill -P $$ tail >&2
