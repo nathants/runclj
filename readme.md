@@ -8,7 +8,7 @@ some tooling around single file clojurescript *scripts* running on node. run a *
 cljs ./rotate_the_logs.cljs
 ```
 
-## install
+## installation
 
 [setup](https://github.com/nathants/bootstraps/blob/master/scripts/cljs.sh) on ubuntu 16.04.
 
@@ -18,7 +18,7 @@ cd boostraps/scripts
 bash cljs.sh
 ```
 
-## use
+## usage
 
 ``` bash
 cljs ./cljs/examples/shell.cljs
