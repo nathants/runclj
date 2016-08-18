@@ -18,12 +18,12 @@ for i in range(10000):
         pass
 else:
     assert False, 'failed to parse ns'
-for xs in ns[2:]:
-    name = getattr(xs[0], 'name', '')
-    if mode == 'source':
-        print '\n'.join(lines[i:])
-        break
-    elif mode == name:
-        for y in xs[1:]:
-            print edn_format.dumps(y)
-        break
+if mode == 'source':
+    print '\n'.join(lines[i:])
+else:
+    for xs in ns[2:]:
+        name = getattr(xs[0], 'name', '')
+        if mode == name:
+            for y in xs[1:]:
+                print edn_format.dumps(y)
+            break

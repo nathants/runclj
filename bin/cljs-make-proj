@@ -57,6 +57,44 @@ cat <<EOF
 EOF
 }
 
+shell() {
+cat <<EOF
+(ns shell
+  (:require-macros [cljs.core.async.macros :as csp])
+  (:require [cljs.core.async :as csp]
+            [clojure.string :as s]
+            [cljs.core.match :refer-macros [match]]            ))
+(def Fiber (js/require "fibers"))
+(defn run-opts
+  [cmd & {:keys [cb]}]
+  (let [fiber (.-current Fiber)
+        cmd (s/join " " (map str cmd))
+        chan (csp/chan)]
+    (println :run cmd)
+    (doto (.spawn (js/require "child_process") "bash" #js ["-c" cmd])
+      (-> .-stdout (.on "data"  #(csp/put! chan [:data (str %)])))
+      (-> .-stderr (.on "data"  #(csp/put! chan [:data (str %)])))
+      (->          (.on "close" #(csp/put! chan [:exit %]))))
+    (csp/go-loop [output ""]
+      (match (csp/<! chan)
+        [:data text] (do (dorun (map (or cb identity) (s/split-lines text)))
+                         (recur (str output text)))
+        [:exit code] (let [val {:exit code
+                                :output (s/trim output)
+                                :cmd cmd
+                                :cwd (.cwd js/process)}]
+                       (if (zero? code)
+                         (.run fiber val)
+                         (.throwInto fiber val)))))
+    (.yield Fiber)))
+(defn run
+  [& cmd]
+  (run-opts cmd))
+(defn run-cb
+  [cb & cmd]
+  (run-opts cmd :cb cb))
+EOF
+}
 
 if [ "$clean" = "true" ]; then
     echo cleaned
@@ -66,10 +104,17 @@ fi
 if [ ! -d $root ]; then
     mkdir -p $root/src
     echo $filepath > $root/filepath
+
+    shell > $root/src/shell.cljs.tmp
+    mv -f $root/src/shell.cljs.tmp $root/src/shell.cljs
+
     main > $root/src/main.clj.tmp
     mv -f $root/src/main.clj.tmp $root/src/main.clj
+
     run > $root/run.js.tmp
     mv -f $root/run.js.tmp $root/run.js
+
     project > $root/project.clj.tmp
     mv -f $root/project.clj.tmp $root/project.clj
+
 fi

@@ -1,5 +1,5 @@
 #!/bin/bash
 set -e
 filepath=$1
-namehash=$(echo $filepath | basename - | sha512sum | awk '{print $1}')
+namehash=$(echo $filepath | python2.7 -c 'import sys, os; print os.path.abspath(sys.stdin.read())' 2>/dev/null | sha512sum | awk '{print $1}')
 echo /tmp/cljs/$namehash

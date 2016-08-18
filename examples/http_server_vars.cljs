@@ -1,7 +1,7 @@
 (ns main
   #_(:npm [express "4.14.0"])
   #_(:lein [prismatic/schema "1.1.3"])
-  (:require [clojure.pprint :as pprint]))
+  (:require [schema.core :as schema :include-macros true]))
 
 (def args (drop 2 (.-argv js/process)) )
 
@@ -25,4 +25,5 @@
 
 (when cli-mode
   (let [[port] args]
+    (schema/validate schema/Str port)
     (start-app (js/parseInt port))))

@@ -3,6 +3,7 @@ set -e
 filepath=$1
 root=$(cljs-root $filepath)
 if [ "$(cljs-hash $filepath)" != "$(cat $root/hash 2>/dev/null || echo '')" ]; then
+    echo recompiling...
     cljs-update $filepath
     cd $root
     lein npm install
@@ -17,4 +18,6 @@ if [ "$(cljs-hash $filepath)" != "$(cat $root/hash 2>/dev/null || echo '')" ]; t
             exit 0
         fi
     done
+else
+    echo using precompiled
 fi
