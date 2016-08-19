@@ -10,7 +10,15 @@ cljs ./rotate_the_logs.cljs
 
 ## installation
 
-a demo [setup](https://github.com/nathants/bootstraps/blob/8ba6a70/scripts/cljs.sh) on ubuntu 16.04 via ec2 and [py-aws](https://github.com/nathants/py-aws/tree/891fa578aefba9c0a8675b07bb138ab44682a0fe).
+depends on:
+- bash
+- python2.7
+  - pip install edn_format
+- java
+- lein
+- node
+
+a demo [setup](https://github.com/nathants/bootstraps/blob/8ba6a70/scripts/cljs.sh) on ubuntu 16.04 via ec2 and [py-aws](https://github.com/nathants/py-aws/tree/891fa578aefba9c0a8675b07bb138ab44682a0fe). also works on macos but setup is more manual, see above dependencies.
 
 ``` bash
 ec2 new cljs-testbox --ami xenial --type m4.large --spot 0.1 --login # py-aws
