@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+filepath=$1
+cljs-make-proj $filepath
+cljs-once $filepath
+cd $(dirname $filepath)
+name=$(basename $filepath)
+tar czf - $(cljs-root $name) $name

@@ -73,3 +73,17 @@ note: that the blocking `sh/run` function must be called inside of a fiber, so i
   #(do (sh/run "whoami")
        ...))
 ```
+
+### deployment
+
+you can ship a compiled script with tar. the os and node versions must match in both locations.
+
+``` bash
+cljs-tar examples/shell.cljs > shell.tgz
+scp shell.tgz ubuntu@remote:
+ssh ubuntu@remote
+tar xf shell.tgz
+
+node .cljs/shell.cljs/run.js # invoke with node only
+cljs shell.cljs # invoke with cljs
+```

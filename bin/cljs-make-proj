@@ -5,10 +5,11 @@ root=$(cljs-root $filepath)
 
 run(){
 cat <<EOF
+#!/usr/bin/env node
 require('source-map-support').install();
-require("$root/out/goog/bootstrap/nodejs");
-require("$root/out/dev.js");
-require("$root/out/main.js");
+require("./out/goog/bootstrap/nodejs");
+require("./out/dev.js");
+require("./out/main.js");
 global.main._main.apply(this, process.argv.slice(2));
 EOF
 }

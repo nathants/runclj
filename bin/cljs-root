@@ -1,5 +1,4 @@
 #!/bin/bash
 set -e
 filepath=$1
-namehash=$(python2.7 -c "import sys, os, hashlib; print hashlib.sha1(os.path.abspath('$filepath')).hexdigest()")
-echo /tmp/cljs/$namehash
+echo $(dirname $filepath)/.cljs/$(basename $filepath)

@@ -6,10 +6,10 @@ pid=$(cat $root/cljs-auto.pid 2>/dev/null || echo "")
 cljs-make-proj $filepath
 # echo subtract TODO num lines from source-map line number because of code added with cljs-update 1>&2
 if [ ! -z "$pid" ] && ps "$pid" >/dev/null; then
-    echo run via: cljs-auto >&2
+    echo :cljs-auto >&2
     cljs-auto-run "$@"
 else
-    echo run via: cljs-once >&2
+    echo :cljs-once >&2
     cljs-once $filepath
     shift
     node $(cljs-root $filepath)/run.js "$@"
