@@ -10,7 +10,7 @@ if [ ! -z "$pid" ] && ps "$pid" >/dev/null; then
     cljs-auto-run "$@"
 else
     echo run via: cljs-once >&2
-    cljs-once $filepath 2>/dev/null
+    cljs-once $filepath
     shift
     node $(cljs-root $filepath)/run.js "$@"
 fi

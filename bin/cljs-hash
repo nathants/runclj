@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
 filepath=$1
-(cat $filepath 2>/dev/null || echo "") | sha512sum | awk '{print $1}'
+(cat $filepath 2>/dev/null || echo "") | python2.7 -c 'import sys, hashlib; print hashlib.sha1(sys.stdin.read()).hexdigest()'

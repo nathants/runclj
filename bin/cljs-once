@@ -1,8 +1,10 @@
 #!/bin/bash
-set -e
+set -ex
 filepath=$1
 root=$(cljs-root $filepath)
-if [ "$(cljs-hash $filepath)" != "$(cat $root/hash 2>/dev/null || echo '')" ]; then
+now=$(cljs-hash $filepath)
+then=$(cat $root/hash 2>/dev/null || echo '')
+if [ "$now" != "$then" ]; then
     echo recompiling... >&2
     cljs-update $filepath
     cd $root
@@ -12,6 +14,7 @@ if [ "$(cljs-hash $filepath)" != "$(cat $root/hash 2>/dev/null || echo '')" ]; t
     tail -f $root/compiler.log| while read line; do
         echo $line >&2
         if echo $line |grep 'Successfully compiled' >/dev/null 2>&1; then
+            echo "$now" > $root/hash
             kill $! >&2
             pkill -P $$ tail >&2
             exit 0
