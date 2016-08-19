@@ -10,7 +10,7 @@ require('source-map-support').install();
 require("./out/goog/bootstrap/nodejs");
 require("./out/dev.js");
 require("./out/main.js");
-global.main._main.apply(this, process.argv.slice(2));
+global.main._main();
 EOF
 }
 project() {
@@ -100,7 +100,7 @@ EOF
 }
 
 if [ "$clean" = "true" ]; then
-    echo cleaned >&2
+    echo :cleaned >&2
     rm -rf "$root"
 fi
 

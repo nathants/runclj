@@ -13,7 +13,6 @@ cat <<EOF
  (.run (sh/Fiber (fn []
                    $(cljs-deps $filepath source)
 ))))
-(set! *main-cli-fn* -main) ;; TODO is this taken care of by run.js last line?
 EOF
 }
 root=$(cljs-root $filepath)/src
