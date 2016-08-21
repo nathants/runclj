@@ -6,5 +6,5 @@ bin/.lein/**/project.clj
 bin/.lein/**/dev.js
 bin/.lein/**/src
 bin/.lein/**/out-release
-
 examples/.lein
+examples/cljs-*

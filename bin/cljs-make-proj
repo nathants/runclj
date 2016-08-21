@@ -48,7 +48,7 @@ cat <<EOF
   :plugins [[lein-cljsbuild "1.1.3"]
             [lein-npm "0.6.2"]]
   :npm {:dependencies [
-                       $([ -z "$noshell" ] && echo '[fibers "1.0.13"] [source-map-support "0.4.2"]')
+                       $([ -z "$noshell" ] && echo '[fibers "1.0.13"] [source-map-support "0.4.2"] [prompt "1.0.0"]')
                        $(cljs-deps $filepath :npm 2>/dev/null)
                       ]}
   :main repl
@@ -115,6 +115,20 @@ cat <<EOF
                             (.run fiber @data)
                             (.throwInto fiber val))))))
     (.yield fibers)))
+(defn prompt
+  [text]
+  (let [p (js/require "prompt")
+        fibers (js/require "fibers")
+        fiber (.-current fibers)]
+    (.start p)
+    (.get p [text] #(.run fiber (first (vals (js->clj %2)))))
+    (.yield fibers)))
+(defn slurp
+  [path]
+  (.readFileSync (js/require "fs") path "utf-8"))
+(defn spit
+  [path text]
+  (.writeFileSync (js/require "fs") path text))
 EOF
 }
 

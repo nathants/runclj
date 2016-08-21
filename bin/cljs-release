@@ -7,7 +7,9 @@ echo :releasing >&2
 cljs-make-proj $filepath
 cljs-update $filepath
 cd $root
-# lein npm install >&2
+lein npm install >&2
+lein npm init -f |sed '1,/^$/d' > package.json.tmp
+mv package.json.tmp package.json
 
 # because cljsbuild doesnt exit speedily after successful compilation, when it does, drop this
 lein cljsbuild once release > compiler.log 2>&1 &
@@ -22,6 +24,6 @@ tail -f compiler.log| while read line; do
     fi
 done
 
-ls | grep -v -e out-release -e node_modules | xargs rm -rf
+ls | grep -v -e out-release -e node_modules -e package.json | xargs rm -rf
 mv out-release/release.js* .
 rm -rf out-release

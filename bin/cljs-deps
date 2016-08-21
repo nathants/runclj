@@ -5,6 +5,9 @@
   (:require [cljs.reader :as reader]
             [clojure.string :as s]))
 
+;; TODO assert that clj and cljs dep is provided in every call to :lein
+;; TODO assert that main/-main is defined
+
 (defn slurp
   [path]
   (.readFileSync (js/require "fs") path "utf-8"))
@@ -26,6 +29,7 @@
         text (slurp filepath)]
     (cond
       (#{:npm :lein :require} key) (some->> (read-string text)
+                                     (filter seq?)
                                      (filter #(= 'ns (first %)))
                                      first
                                      (filter list?)
