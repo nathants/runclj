@@ -1,20 +1,8 @@
 #!/bin/bash
 set -e
 filepath=$1
-src() {
-cat <<EOF
-(ns main
-  (:require [shell :as sh]
-            [cljs.nodejs :as nodejs]
-            $(cljs-deps $filepath require)
-))
-(nodejs/enable-util-print!)
-(defn -main [& _]
- (.run (sh/Fiber (fn []
-                   $(cljs-deps $filepath source)
-))))
-EOF
-}
 root=$(cljs-root $filepath)/src
-src > $root/main.cljs.tmp
+cljs-deps $filepath :macro > $root/main.clj.tmp
+mv -f $root/main.clj.tmp $root/main.clj
+cljs-deps $filepath :source > $root/main.cljs.tmp
 mv -f $root/main.cljs.tmp $root/main.cljs

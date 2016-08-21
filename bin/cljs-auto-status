@@ -3,9 +3,9 @@ set -e
 filepath=$1
 pid=$(cat $(cljs-root $filepath)/cljs-auto.pid 2>/dev/null || echo "")
 if [ ! -z "$pid" ] && ps $pid >/dev/null; then
-    echo $pid "running"
+    echo :auto-running $pid >&2
     exit 0
 else
-    echo "stopped"
+    echo :auto-stopped >&2
     exit 1
 fi

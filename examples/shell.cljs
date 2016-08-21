@@ -1,36 +1,32 @@
 (ns main
-  (:require [shell :as sh]
-            [clojure.string :as s]
-            [clojure.pprint :as pp]))
+  #_ (:lein [org.clojure/clojure "1.9.0-alpha10"]
+            [org.clojure/clojurescript "1.9.216"])
+  (:require [clojure.string :as s]
+            [clojure.pprint :as pp]
+            [shell :as sh]))
 
-;; see the args
-(println "args:" (.-argv js/process))
+(defn -main
+  [& args]
+  (println (sh/run "echo cli args:" (vec args)))
 
-;; data munge some output
-(println "")
-(->> "ls /tmp | head"
-  sh/run
-  s/split-lines
-  (map count)
-  frequencies
-  (sort-by first)
-  (map println)
-  dorun)
+  (println "\n;; data munge some output")
+  (->> "ls /tmp | head"
+    sh/run
+    s/split-lines
+    (map count)
+    frequencies
+    (sort-by first)
+    (map println)
+    dorun)
 
-;; run a callback on each line of output
-(println "")
-(def num (atom 0))
-(defn callback [line]
-  (println "number:" (swap! num inc) "output:" line))
-(sh/run-cb callback "ls" "/tmp" "|head")
+  (println "\n;; run a callback on each line of output")
+  (def num (atom 0))
+  (defn callback [line]
+    (println "number:" (swap! num inc) "output:" line))
+  (sh/run callback "ls" "/tmp" "|head")
 
-;; inspect the results
-(print "")
-(prn (sh/run-cb identity "ls /tmp |head"))
-
-;; deal with non zero exits
-(print "")
-(try
-  (sh/run "false")
-  (catch :default result
-    (pp/pprint result)))
+  (print "\n;; deal with non zero exits")
+  (try
+    (sh/run "false")
+    (catch :default result
+      (pp/pprint result))))

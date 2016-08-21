@@ -1,29 +1,57 @@
-#!/usr/bin/env python2.7
-import sys
-import re
-import edn_format
+#!/usr/bin/env cljs
+(ns main
+  #_(:lein [org.clojure/clojure "1.9.0-alpha10"]
+           [org.clojure/clojurescript "1.9.216"])
+  (:require [cljs.reader :as reader]
+            [clojure.string :as s]))
 
-filepath = sys.argv[1]
-mode = sys.argv[2]
+(defn slurp
+  [path]
+  (.readFileSync (js/require "fs") path "utf-8"))
 
-with open(filepath) as f:
-    lines = f.read().splitlines()
-lines = [re.sub('#_', '', line) for line in lines]
-for i in range(10000):
-    i += 1
-    try:
-        ns = edn_format.loads('\n'.join(lines[:i]))
-        break
-    except:
-        pass
-else:
-    assert False, 'failed to parse ns'
-if mode == 'source':
-    print '\n'.join(lines[i:])
-else:
-    for xs in ns[2:]:
-        name = getattr(xs[0], 'name', '')
-        if mode == name:
-            for y in xs[1:]:
-                print edn_format.dumps(y)
-            break
+(defn read-string
+  [text]
+  (let [buffer (-> text (s/replace #"#_" "") reader/push-back-reader)]
+    (loop [forms []]
+      (try
+        (recur (conj forms (reader/read buffer :throw-on-error)))
+        (catch :default ex
+          (if (not= "EOF while reading" (.-message ex))
+            (recur forms)
+            forms))))))
+
+(defn -main
+  [filepath key]
+  (let [key (reader/read-string key)
+        text (slurp filepath)]
+    (cond
+      (#{:npm :lein :require} key) (some->> (read-string text)
+                                     (filter #(= 'ns (first %)))
+                                     first
+                                     (filter list?)
+                                     (filter #(= key (first %)))
+                                     first
+                                     rest
+                                     (map prn)
+                                     dorun)
+      (#{:macro :source} key) (let [sum (atom 0)
+                                    forms (as-> text $
+                                            (map (fn [char]
+                                                   (condp = char
+                                                     \( 1
+                                                     \) -1
+                                                     0)) $)
+                                            (map vector (range) $ (map #(swap! sum + %) $))
+                                            (partition-by #(= [0 0] (rest %)) $)
+                                            (map (fn [x] [(ffirst x) (first (last x))]) $)
+                                            (map (fn [[start end]] (s/join "" (subvec (vec text) start (inc end)))) $))]
+                                (println
+                                 (s/join ""
+                                     (condp = key
+                                       :source  (for [form forms]
+                                                  (if (s/starts-with? (s/trim form) "(defmacro")
+                                                    (s/join "\n" (map #(str ";; " %) (s/split-lines form)))
+                                                    form))
+                                       :macro (cons "(ns main)\n" (for [form forms
+                                                                        :when (s/starts-with? (s/trim form) "(defmacro")]
+                                                                    form)))))))))

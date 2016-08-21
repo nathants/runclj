@@ -1,16 +1,23 @@
 (ns main
-  #_(:npm [express "4.14.0"]))
+  #_(:npm [express "4.14.0"])
+  #_(:lein [org.clojure/clojure "1.9.0-alpha10"]
+           [org.clojure/clojurescript "1.9.216"]))
 
 (def port 8000)
 
-(println "listening on:" port)
+(defn logging-middleware
+  [req res next]
+  (.on res "finish" #(println (.-statusCode res) (.-url req)))
+  (next))
 
-(def app ((js/require "express")))
+(defn status-handler
+  [req res]
+  (.send res "home"))
 
-(.get app "/" (fn [req res]
-                (.send res "home page")))
-
-(.get app "/status" (fn [req res]
-                      (.send res "status is green")))
-
-(.listen app port)
+(defn -main
+  []
+  (println "listening on:" port)
+  (doto ((js/require "express"))
+    (.use logging-middleware)
+    (.get "/home" status-handler)
+    (.listen port)))

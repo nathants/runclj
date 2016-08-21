@@ -1,0 +1,25 @@
+#!/bin/bash
+set -e
+filepath=$1
+root=$(cljs-root $filepath)
+echo :recompiling >&2
+tail -n0 -f $root/compiler.log >&2 &
+
+src=$(cljs-root $filepath)/src
+cljs-deps $filepath :macro > $root/main.clj.tmp
+cljs-deps $filepath :source > $root/main.cljs.tmp
+
+if [ "$(cat $root/main.clj.tmp | shasum)" != "$(cat $src/main.clj | shasum)" ]; then
+    echo :clj-source >&2
+    mv -f $root/main.clj.tmp $src/main.clj
+    now=$(cat $root/compiled.log|wc -l)
+    while true; do [ "$now" != "$(cat $root/compiled.log|wc -l)" ] && break; sleep .025; done
+
+elif [ "$(cat $root/main.cljs.tmp | shasum)" != "$(cat $src/main.cljs | shasum)" ]; then
+    echo :cljs-source >&2
+    now=$(cat $root/compiled.log|wc -l)
+    mv -f $root/main.cljs.tmp $src/main.cljs
+    while true; do [ "$now" != "$(cat $root/compiled.log|wc -l)" ] && break; sleep .025; done
+fi
+
+kill -13 $!

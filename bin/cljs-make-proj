@@ -3,48 +3,83 @@ set -e
 filepath=$1
 root=$(cljs-root $filepath)
 
-run(){
+runner(){
 cat <<EOF
-#!/usr/bin/env node
-require('source-map-support').install();
-require("./out/goog/bootstrap/nodejs");
-require("./out/dev.js");
-require("./out/main.js");
-global.main._main();
+(ns cljs-runner
+  (:require [main :as main]
+            [cljs.nodejs :as nodejs]))
+(nodejs/enable-util-print!)
+(defn run [& _]
+  (apply main/-main (drop 2 (.-argv js/process))))
+(set! *main-cli-fn* run)
 EOF
 }
+
+fibers_runner(){
+cat <<EOF
+(ns cljs-runner
+  (:require [main :as main]
+            [cljs.nodejs :as nodejs]))
+(nodejs/enable-util-print!)
+(defn run [& _]
+  (.run ((js/require "fibers") #(apply main/-main (drop 2 (.-argv js/process))))))
+(set! *main-cli-fn* run)
+EOF
+}
+
+
+dev(){
+cat <<EOF
+#!/usr/bin/env node
+try { require('source-map-support').install(); } catch(e) {};
+require("./out/goog/bootstrap/nodejs");
+require("./out/dev.js");
+require("./out/cljs_runner.js");
+global.cljs_runner.run();
+EOF
+}
+
 project() {
 cat <<EOF
 (defproject $(basename $filepath) "0.0.1"
-  :dependencies [[org.clojure/clojure "1.9.0-alpha10"]
-                 [org.clojure/clojurescript "1.9.216"]
-                 [org.clojure/core.async "0.2.385"]
-                 [org.clojure/core.match "0.3.0-alpha4"]
-                 [com.cemerick/piggieback "0.2.1"]
-                 $(cljs-deps $filepath lein)
+  :dependencies [[com.cemerick/piggieback "0.2.1"]
+                 $(cljs-deps $filepath :lein 2>/dev/null)
                 ]
   :plugins [[lein-cljsbuild "1.1.3"]
             [lein-npm "0.6.2"]]
-  :npm {:dependencies [[source-map-support "0.4.2"]
-                       [fibers "1.0.13"]
-                       $(cljs-deps $filepath npm)
+  :npm {:dependencies [
+                       $([ -z "$noshell" ] && echo '[fibers "1.0.13"] [source-map-support "0.4.2"]')
+                       $(cljs-deps $filepath :npm 2>/dev/null)
                       ]}
-  :main main
+  :main repl
   :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
-  :cljsbuild {:builds [{:source-paths ["src"]
+  :cljsbuild {:builds [{:id "dev"
+                        :source-paths ["src"]
                         :notify-command ["bash" "-c" "cljs-hash $(pwd)/$filepath >hash"]
                         :compiler {:output-to "out/dev.js"
                                    :output-dir "out"
                                    :source-map true
                                    :optimizations :none
+
                                    :pretty-print true
+                                   :target :nodejs}}
+                       {:id "release"
+                        :source-paths ["src"]
+                        :notify-command ["bash" "-c" "cljs-hash $(pwd)/$filepath >out-release/hash"]
+                        :compiler {:output-to "out-release/release.js"
+                                   :source-map "out-release/release.js.map"
+                                   :output-dir "out-release"
+                                   :optimizations :simple
                                    :cache-analysis true
-                                   :target :nodejs}}]})
+                                   :target :nodejs}}
+
+]})
 EOF
 }
-main() {
+
+repl() {
 cat <<EOF
-(ns main
+(ns repl
   (:require [cemerick.piggieback :refer [cljs-repl]]
             [cljs.repl.node :refer [repl-env]]))
 (defn start-node-repl
@@ -61,63 +96,49 @@ EOF
 shell() {
 cat <<EOF
 (ns shell
-  (:require-macros [cljs.core.async.macros :as csp])
-  (:require [cljs.core.async :as csp]
-            [clojure.string :as s]
-            [cljs.core.match :refer-macros [match]]))
-(def Fiber (js/require "fibers"))
-(defn run-opts
-  [cmd & {:keys [cb]}]
-  (let [fiber (.-current Fiber)
-        cmd (s/join " " (map str cmd))
-        chan (csp/chan)]
-    (.error js/console (str "run: " cmd))
-    (doto (.spawn (js/require "child_process") "bash" #js ["-c" cmd])
-      (-> .-stdout (.on "data"  #(csp/put! chan [:data (str %)])))
-      (->          (.on "close" #(csp/put! chan [:exit %]))))
-    (csp/go-loop [output ""]
-      (match (csp/<! chan)
-        [:data text] (do (dorun (map (or cb identity) (s/split-lines text)))
-                         (recur (str output text)))
-        [:exit code] (let [val {:exit code
-                                :output (s/trim output)
-                                :cmd cmd
-                                :cwd (.cwd js/process)}]
-                       (if (zero? code)
-                         (.run fiber (:output val))
-                         (.throwInto fiber val)))))
-    (.yield Fiber)))
+  (:require [clojure.string :as s]))
+(def fibers (js/require "fibers"))
 (defn run
   [& cmd]
-  (run-opts cmd))
-(defn run-cb
-  [cb & cmd]
-  (run-opts cmd :cb cb))
-(defn run-fiber
-  [f]
-  (.run (Fiber f)))
+  (let [[cb cmd] (if (fn? (first cmd))
+                   [(first cmd) (rest cmd)]
+                   [identity cmd])
+        cmd (s/join " " (map str cmd))
+        fiber (.-current fibers)
+        data (atom "")]
+    (.error js/console (str "run: " cmd))
+    (doto (.spawn (js/require "child_process") "bash" #js ["-c" cmd])
+      (-> .-stdout (.on "data" #(do (dorun (map cb (s/split-lines %)))
+                                    (swap! data str %))))
+      (-> (.on "close" #(let [val {:exit % :output @data :cmd cmd :cwd (.cwd js/process)}]
+                          (if (zero? %)
+                            (.run fiber @data)
+                            (.throwInto fiber val))))))
+    (.yield fibers)))
 EOF
 }
 
-if [ "$clean" = "true" ]; then
-    echo :cleaned >&2
-    rm -rf "$root"
-fi
+mkdir -p $root/src
 
-if [ ! -d $root ]; then
-    mkdir -p $root/src
-    echo $filepath > $root/filepath
+[ ! -z "$noshell" ] && echo :noshell
 
+if [ -z "$noshell" ]; then
     shell > $root/src/shell.cljs.tmp
     mv -f $root/src/shell.cljs.tmp $root/src/shell.cljs
-
-    main > $root/src/main.clj.tmp
-    mv -f $root/src/main.clj.tmp $root/src/main.clj
-
-    run > $root/run.js.tmp
-    mv -f $root/run.js.tmp $root/run.js
-
-    project > $root/project.clj.tmp
-    mv -f $root/project.clj.tmp $root/project.clj
-
 fi
+
+if [ -z "$noshell" ]; then
+    fibers_runner
+else
+    runner
+fi > $root/src/cljs_runner.cljs.tmp
+mv -f $root/src/cljs_runner.cljs.tmp $root/src/cljs_runner.cljs
+
+repl > $root/src/repl.clj.tmp
+mv -f $root/src/repl.clj.tmp $root/src/repl.clj
+
+dev > $root/dev.js.tmp
+mv -f $root/dev.js.tmp $root/dev.js
+
+project > $root/project.clj.tmp
+mv -f $root/project.clj.tmp $root/project.clj

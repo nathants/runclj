@@ -1,8 +1,7 @@
 #!/bin/bash
-set -e
+set -ex
 filepath=$1
-cljs-make-proj $filepath
-cljs-once $filepath
-cd $(dirname $filepath)
+cljs-release $filepath
 name=$(basename $filepath)
-tar czf - $(cljs-root $name) $name
+cd $(cljs-root $filepath)/..
+tar czf - $name

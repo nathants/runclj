@@ -1,4 +1,8 @@
 #!/bin/bash
 set -e
-filepath=$1
-echo $(dirname $filepath)/.cljs/$(basename $filepath)
+if [ ! -z "$cljs_root" ]; then
+    filepath=$cljs_root
+else
+    filepath=$1
+fi
+python2.7 -c "import os; print os.path.abspath('$(dirname $filepath)/.lein/$(basename $filepath)')"
