@@ -22,4 +22,6 @@ elif [ "$(cat $root/main.cljs.tmp | shasum)" != "$(cat $src/main.cljs | shasum)"
     while true; do [ "$now" != "$(cat $root/compiled.log|wc -l)" ] && break; sleep .025; done
 fi
 
+cljs-hash $filepath > $root/hash
+
 kill -13 $!

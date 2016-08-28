@@ -17,7 +17,7 @@ echo :recompiling >&2
 tail -f compiler.log| while read line; do
     echo $line >&2
     if echo $line |grep 'Successfully compiled' >/dev/null 2>&1; then
-        echo "$now" > hash
+        cljs-hash $filepath > $root/hash
         kill -13 $! >&2
         pkill --signal 13 -P $$ tail >&2
         exit 0

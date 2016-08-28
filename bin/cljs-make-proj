@@ -55,7 +55,6 @@ cat <<EOF
   :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
   :cljsbuild {:builds [{:id "dev"
                         :source-paths ["src"]
-                        :notify-command ["bash" "-c" "cljs-hash $(pwd)/$filepath >hash"]
                         :compiler {:output-to "out/dev.js"
                                    :output-dir "out"
                                    :source-map true
@@ -65,7 +64,6 @@ cat <<EOF
                                    :target :nodejs}}
                        {:id "release"
                         :source-paths ["src"]
-                        :notify-command ["bash" "-c" "cljs-hash $(pwd)/$filepath >out-release/hash"]
                         :compiler {:output-to "out-release/release.js"
                                    :source-map "out-release/release.js.map"
                                    :output-dir "out-release"
