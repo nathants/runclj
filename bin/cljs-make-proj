@@ -53,6 +53,7 @@ cat <<EOF
                       ]}
   :main repl
   :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
+  ;; TODO instead of copying code in, link via source-paths so stack traces point to actual code files
   :cljsbuild {:builds [{:id "dev"
                         :source-paths ["src"]
                         :compiler {:output-to "out/dev.js"
@@ -106,8 +107,9 @@ cat <<EOF
         data (atom "")]
     (.error js/console (str "run: " cmd))
     (doto (.spawn (js/require "child_process") "bash" #js ["-c" cmd])
-      (-> .-stdout (.on "data" #(do (dorun (map cb (s/split-lines %)))
+      (-> .-stdout (.on "data" #(do (dorun (map cb (s/split-lines (.toString % "utf8"))))
                                     (swap! data str %))))
+      (-> .-stderr (.on "data" #(dorun (map println (s/split-lines (.toString % "utf8"))))))
       (-> (.on "close" #(let [val {:exit % :output @data :cmd cmd :cwd (.cwd js/process)}]
                           (if (zero? %)
                             (.run fiber @data)
