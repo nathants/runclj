@@ -3,6 +3,7 @@ set -e
 filepath=$1
 root=$(cljs-root $filepath)
 if ! cljs-auto-status $filepath 2>/dev/null; then
+    # TODO the first start with `auto=y cljs` always fails because target/nodejs/ hasnt compiled yet. wait for it?
     echo :auto-starting >&2
     cljs-make-proj $filepath
     cljs-update $filepath

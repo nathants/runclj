@@ -105,14 +105,13 @@ cat <<EOF
         cmd (s/join " " (map str cmd))
         fiber (.-current fibers)
         data (atom "")]
-    (.error js/console (str "run: " cmd))
     (doto (.spawn (js/require "child_process") "bash" #js ["-c" cmd])
       (-> .-stdout (.on "data" #(do (dorun (map cb (s/split-lines (.toString % "utf8"))))
                                     (swap! data str %))))
       (-> .-stderr (.on "data" #(dorun (map println (s/split-lines (.toString % "utf8"))))))
       (-> (.on "close" #(let [val {:exit % :output @data :cmd cmd :cwd (.cwd js/process)}]
                           (if (zero? %)
-                            (.run fiber @data)
+                            (.run fiber (.trim @data))
                             (.throwInto fiber val))))))
     (.yield fibers)))
 (defn prompt
