@@ -24,7 +24,7 @@ ec2 new cljs-testbox --ami xenial --type m4.large --spot 1.0 --login # py-aws
 git clone https://github.com/nathants/bootstraps
 git checkout 730cc1d
 cd boostraps/scripts
-bash cljs.sh
+bash runclj.sh
 ```
 
 ## usage
