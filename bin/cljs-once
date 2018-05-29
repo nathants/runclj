@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 filepath=$1
 root=$(cljs-root $filepath)
 now=$(cljs-hash $filepath)
@@ -8,15 +8,5 @@ cljs-make-proj $filepath
 cljs-update $filepath
 cd $root
 lein npm install >&2
-
-# because cljsbuild doesnt exit speedily after successful compilation, when it does, drop this
-lein cljsbuild once dev > compiler.log 2>&1 &
-tail -f compiler.log| while read line; do
-    echo $line >&2
-    if echo $line |grep 'Successfully compiled' >/dev/null 2>&1; then
-        echo "$now" > hash
-        kill -13 $! >&2
-        pkill --signal 13 -P $$ tail >&2
-        exit 0
-    fi
-done
+lein cljsbuild once dev
+echo "$now" > hash

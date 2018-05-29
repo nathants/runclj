@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 filepath=$1
 root=$(cljs-root $filepath)
 echo :recompiling >&2

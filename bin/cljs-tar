@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -euo pipefail
 filepath=$1
 cljs-release $filepath
 name=$(basename $filepath)

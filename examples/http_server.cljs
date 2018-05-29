@@ -1,7 +1,7 @@
 (ns main
   #_(:npm [express "4.14.0"])
-  #_(:lein [org.clojure/clojure "1.9.0-alpha10"]
-           [org.clojure/clojurescript "1.9.216"]))
+  #_(:lein [org.clojure/clojure "1.9.0"]
+           [org.clojure/clojurescript "1.10.238"]))
 
 (def port 8000)
 

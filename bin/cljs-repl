@@ -1,14 +1,10 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 filepath=$1
 root=$(cljs-root $filepath)
-[ ! -z "$clean" ] && echo :cleaned >&2 && rm -rf "$root"
+[ ! -z "${clean:-}" ] && echo :cleaned >&2 && rm -rf "$root"
 cljs-make-proj $filepath
 cljs-update $filepath
 cd $root
 lein npm install
 lein trampoline repl :headless
-
-# TODO with this https://github.com/cemerick/piggieback/issues/61 is
-# fixed, we can have cljs-repl replace cljs-auto-*, which would be
-# nice.

@@ -1,5 +1,6 @@
 #!/bin/bash
-set -e
+set -euo pipefail
+
 filepath=$1
 root=$(cljs-root $filepath)
 if ls $root/release.js >/dev/null 2>&1; then
@@ -7,16 +8,16 @@ if ls $root/release.js >/dev/null 2>&1; then
     node $root/release.js "$@"
 else
     echo :root $root/ >&2
-    if ! cljs-auto-status $filepath 2>/dev/null && [ ! -z "$clean" ]; then
+    if ! cljs-auto-status $filepath 2>/dev/null && [ ! -z "${clean:-}" ]; then
         echo :cleaned >&2
         rm -rf "$root"
     fi
-    if [ ! -z "$auto" ]; then
+    if [ ! -z "${auto:-}" ]; then
         cljs-auto-start $filepath
     fi
     source_hash=$(cljs-hash $filepath)
     compiled_hash=$(cat $root/hash 2>/dev/null || echo '')
-    if [ ! -z "$usecached" ] || [ "$source_hash" == "$compiled_hash" ]; then
+    if [ ! -z "${usecached:-}" ] || [ "$source_hash" == "$compiled_hash" ]; then
         echo :cached >&2
     elif cljs-auto-status $filepath 2>/dev/null; then
         echo :cljs-auto >&2
@@ -27,5 +28,8 @@ else
     fi
     echo :stdout >&2
     shift
+    mv $root/out/dev.js $root/out/dev.js.tmp
+    cat $root/out/dev.js.tmp | sed -r "s:path\.resolve\([^\)]+\):'$root':" > $root/out/dev.js
+    rm $root/out/dev.js.tmp
     node $root/dev.js "$@"
 fi

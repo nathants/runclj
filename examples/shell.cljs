@@ -1,6 +1,6 @@
 (ns main
-  #_ (:lein [org.clojure/clojure "1.9.0-alpha10"]
-            [org.clojure/clojurescript "1.9.216"])
+  #_ (:lein [org.clojure/clojure "1.9.0"]
+            [org.clojure/clojurescript "1.10.238"])
   (:require [clojure.string :as s]
             [clojure.pprint :as pp]
             [shell :as sh]))

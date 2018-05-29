@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 filepath=$1
 root=$(cljs-root $filepath)
 
@@ -27,14 +27,13 @@ cat <<EOF
 EOF
 }
 
-
 dev(){
 cat <<EOF
 #!/usr/bin/env node
 try { require('source-map-support').install(); } catch(e) {};
-require("./out/goog/bootstrap/nodejs");
-require("./out/dev.js");
-require("./out/cljs_runner.js");
+require("$root/out/goog/bootstrap/nodejs");
+require("$root/out/dev.js");
+require("$root/out/cljs_runner.js");
 global.cljs_runner.run();
 EOF
 }
@@ -42,17 +41,17 @@ EOF
 project() {
 cat <<EOF
 (defproject $(basename $filepath) "0.0.1"
-  :dependencies [[com.cemerick/piggieback "0.2.1"]
+  :dependencies [[cider/piggieback "0.3.5"]
                  $(cljs-deps $filepath :lein 2>/dev/null)
                 ]
-  :plugins [[lein-cljsbuild "1.1.3"]
+  :plugins [[lein-cljsbuild "1.1.7"]
             [lein-npm "0.6.2"]]
   :npm {:dependencies [
-                       $([ -z "$noshell" ] && echo '[fibers "1.0.13"] [source-map-support "0.4.2"] [prompt "1.0.0"]')
+                       $([ -z "${noshell:-}" ] && echo '[fibers "2.0.2"] [source-map-support "0.5.6"] [prompt "1.0.0"]')
                        $(cljs-deps $filepath :npm 2>/dev/null)
                       ]}
   :main repl
-  :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
+  :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
   ;; TODO instead of copying code in, link via source-paths so stack traces point to actual code files
   :cljsbuild {:builds [{:id "dev"
                         :source-paths ["src"]
@@ -60,7 +59,7 @@ cat <<EOF
                                    :output-dir "out"
                                    :source-map true
                                    :optimizations :none
-
+                                   :main "main"
                                    :pretty-print true
                                    :target :nodejs}}
                        {:id "release"
@@ -79,7 +78,7 @@ EOF
 repl() {
 cat <<EOF
 (ns repl
-  (:require [cemerick.piggieback :refer [cljs-repl]]
+  (:require [cider.piggieback :refer [cljs-repl]]
             [cljs.repl.node :refer [repl-env]]))
 (defn start-node-repl
   []
@@ -133,14 +132,14 @@ EOF
 
 mkdir -p $root/src
 
-[ ! -z "$noshell" ] && echo :noshell
+[ ! -z "${noshell:-}" ] && echo :noshell
 
-if [ -z "$noshell" ]; then
+if [ -z "${noshell:-}" ]; then
     shell > $root/src/shell.cljs.tmp
     mv -f $root/src/shell.cljs.tmp $root/src/shell.cljs
 fi
 
-if [ -z "$noshell" ]; then
+if [ -z "${noshell:-}" ]; then
     fibers_runner
 else
     runner

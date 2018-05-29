@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 filepath=$1
 pid=$(cat $(cljs-root $filepath)/cljs-auto.pid 2>/dev/null || echo "")
 if [ ! -z "$pid" ] && ps $pid >/dev/null; then

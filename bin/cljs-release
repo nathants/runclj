@@ -1,29 +1,18 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 filepath=$1
-[ ! -z "$clean" ] && echo :cleaned >&2 && rm -rf "$(cljs-root $filepath)"
+[ ! -z "${clean:-}" ] && echo :cleaned >&2 && rm -rf "$(cljs-root $filepath)"
 root=$(cljs-root $filepath)
 echo :releasing >&2
 cljs-make-proj $filepath
 cljs-update $filepath
 cd $root
+rm -f package.json*
 lein npm install >&2
 lein npm init -f |sed '1,/^$/d' > package.json.tmp
 mv package.json.tmp package.json
-
-# because cljsbuild doesnt exit speedily after successful compilation, when it does, drop this
-lein cljsbuild once release > compiler.log 2>&1 &
 echo :recompiling >&2
-tail -f compiler.log| while read line; do
-    echo $line >&2
-    if echo $line |grep 'Successfully compiled' >/dev/null 2>&1; then
-        cljs-hash $filepath > $root/hash
-        kill -13 $! >&2
-        pkill --signal 13 -P $$ tail >&2
-        exit 0
-    fi
-done
-
+lein cljsbuild once release
 ls | grep -v -e out-release -e node_modules -e package.json | xargs rm -rf
 mv out-release/release.js* .
 rm -rf out-release

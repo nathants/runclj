@@ -12,12 +12,12 @@ cljs ./rotate_the_logs.cljs
 
 depends on:
 - bash
-- python2.7
+- python3.6
 - java
 - lein
 - node
 
-a demo [setup](https://github.com/nathants/bootstraps/blob/730cc1d/scripts/cljs.sh) on ubuntu 16.04 via [ec2](https://github.com/nathants/py-aws/tree/891fa578aefba9c0a8675b07bb138ab44682a0fe). also works on macos but setup is more manual, see above dependencies.
+a demo [setup](https://github.com/nathants/bootstraps/blob/aa1c119d0182784199e425bad810ee53fb97ca64/ubuntu/scripts/runclj.sh/) on ubuntu via [ec2](https://github.com/nathants/py-aws/tree/7f436794e3cfaeeb6da3e85d457307e2eef442c2). also works on macos but setup is more manual, see above dependencies.
 
 ``` bash
 ec2 new cljs-testbox --ami xenial --type m4.large --spot 1.0 --login # py-aws
@@ -60,7 +60,7 @@ auto=y cljs ./cljs/examples/shell.cljs # fast compiles!
 cljs-auto-stop ./cljs/examples/shell.cljs
 ```
 
-to force a lein project level rebuild, use an env variable `clean=true cljs ...`.
+to force a lein project level rebuild, use an env variable `clean=y cljs ...`.
 
 you can use a repl as an alternative/addition to just running the script with `cljs`. start the repl with `cljs-repl ./cljs/examples/shell.cljs`, then jack-in to the nrepl on the port it printed, then call the function `(start-node-repl)`.
 
