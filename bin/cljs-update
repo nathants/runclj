@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euo pipefail
+# TODO instead of copying code in, link via source-paths so stack traces point to actual code files
 filepath=$1
 root=$(cljs-root $filepath)/src
 cljs-deps $filepath :macro > $root/main.clj.tmp

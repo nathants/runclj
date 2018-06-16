@@ -15,18 +15,6 @@ cat <<EOF
 EOF
 }
 
-fibers_runner(){
-cat <<EOF
-(ns cljs-runner
-  (:require [main :as main]
-            [cljs.nodejs :as nodejs]))
-(nodejs/enable-util-print!)
-(defn run [& _]
-  (.run ((js/require "fibers") #(apply main/-main (drop 2 (.-argv js/process))))))
-(set! *main-cli-fn* run)
-EOF
-}
-
 dev(){
 cat <<EOF
 #!/usr/bin/env node
@@ -39,20 +27,13 @@ EOF
 }
 
 project() {
+npm=$(cljs-deps $filepath :npm 2>/dev/null | tr -d '[]')
 cat <<EOF
 (defproject $(basename $filepath) "0.0.1"
-  :dependencies [[cider/piggieback "0.3.5"]
-                 $(cljs-deps $filepath :lein 2>/dev/null)
-                ]
-  :plugins [[lein-cljsbuild "1.1.7"]
-            [lein-npm "0.6.2"]]
-  :npm {:dependencies [
-                       $([ -z "${noshell:-}" ] && echo '[fibers "2.0.2"] [source-map-support "0.5.6"] [prompt "1.0.0"]')
-                       $(cljs-deps $filepath :npm 2>/dev/null)
-                      ]}
+  :dependencies [[cider/piggieback "0.3.6"] $(cljs-deps $filepath :lein 2>/dev/null)]
+  :plugins [[lein-cljsbuild "1.1.7"]]
   :main repl
   :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
-  ;; TODO instead of copying code in, link via source-paths so stack traces point to actual code files
   :cljsbuild {:builds [{:id "dev"
                         :source-paths ["src"]
                         :compiler {:output-to "out/dev.js"
@@ -61,6 +42,8 @@ cat <<EOF
                                    :optimizations :none
                                    :main "main"
                                    :pretty-print true
+                                   :npm-deps {$npm}
+                                   :install-deps true
                                    :target :nodejs}}
                        {:id "release"
                         :source-paths ["src"]
@@ -69,9 +52,9 @@ cat <<EOF
                                    :output-dir "out-release"
                                    :optimizations :simple
                                    :cache-analysis true
-                                   :target :nodejs}}
-
-]})
+                                   :npm-deps {$npm}
+                                   :install-deps true
+                                   :target :nodejs}}]})
 EOF
 }
 
@@ -95,55 +78,12 @@ shell() {
 cat <<EOF
 (ns shell
   (:require [clojure.string :as s]))
-(def fibers (js/require "fibers"))
-(defn run
-  [& cmd]
-  (let [[cb cmd] (if (fn? (first cmd))
-                   [(first cmd) (rest cmd)]
-                   [identity cmd])
-        cmd (s/join " " (map str cmd))
-        fiber (.-current fibers)
-        data (atom "")]
-    (doto (.spawn (js/require "child_process") "bash" #js ["-c" cmd])
-      (-> .-stdout (.on "data" #(do (dorun (map cb (s/split-lines (.toString % "utf8"))))
-                                    (swap! data str %))))
-      (-> .-stderr (.on "data" #(dorun (map println (s/split-lines (.toString % "utf8"))))))
-      (-> (.on "close" #(let [val {:exit % :output @data :cmd cmd :cwd (.cwd js/process)}]
-                          (if (zero? %)
-                            (.run fiber (.trim @data))
-                            (.throwInto fiber val))))))
-    (.yield fibers)))
-(defn prompt
-  [text]
-  (let [p (js/require "prompt")
-        fibers (js/require "fibers")
-        fiber (.-current fibers)]
-    (.start p)
-    (.get p [text] #(.run fiber (first (vals (js->clj %2)))))
-    (.yield fibers)))
-(defn slurp
-  [path]
-  (.readFileSync (js/require "fs") path "utf-8"))
-(defn spit
-  [path text]
-  (.writeFileSync (js/require "fs") path text))
 EOF
 }
 
 mkdir -p $root/src
 
-[ ! -z "${noshell:-}" ] && echo :noshell
-
-if [ -z "${noshell:-}" ]; then
-    shell > $root/src/shell.cljs.tmp
-    mv -f $root/src/shell.cljs.tmp $root/src/shell.cljs
-fi
-
-if [ -z "${noshell:-}" ]; then
-    fibers_runner
-else
-    runner
-fi > $root/src/cljs_runner.cljs.tmp
+runner > $root/src/cljs_runner.cljs.tmp
 mv -f $root/src/cljs_runner.cljs.tmp $root/src/cljs_runner.cljs
 
 repl > $root/src/repl.clj.tmp

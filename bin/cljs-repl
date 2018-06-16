@@ -6,5 +6,4 @@ root=$(cljs-root $filepath)
 cljs-make-proj $filepath
 cljs-update $filepath
 cd $root
-lein npm install
 lein trampoline repl :headless

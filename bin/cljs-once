@@ -7,6 +7,5 @@ echo :recompiling >&2
 cljs-make-proj $filepath
 cljs-update $filepath
 cd $root
-lein npm install >&2
 lein cljsbuild once dev
 echo "$now" > hash

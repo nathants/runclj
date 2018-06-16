@@ -8,8 +8,8 @@ if ! cljs-auto-status $filepath 2>/dev/null; then
     cljs-update $filepath
     cd $root
     rm -f package.json*
-    lein npm install
-    nohup bash -c 'lein trampoline cljsbuild auto dev 2>&1 | tee >(grep --line-buffered "Successfully compiled" > compiled.log) > compiler.log 2>&1' >/dev/null &
+    nohup bash -c 'lein trampoline cljsbuild auto dev 2>&1 | tee >(grep --line-buffered "Successfully compiled" > compiled.log) > compiler.log 2>&1' &>/dev/null &
+    echo :cljsbuild :auto >&2
     echo $! > cljs-auto.pid
     while true; do
         if [ -f out/dev.js ]; then

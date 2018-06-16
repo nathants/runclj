@@ -12,7 +12,7 @@
 
 (defn status-handler
   [req res]
-  (.send res "home"))
+  (.send res "ok 200"))
 
 (defn -main
   []

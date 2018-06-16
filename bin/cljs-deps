@@ -1,61 +1,96 @@
-#!/usr/bin/env cljs
-(ns main
-  #_(:lein [org.clojure/clojure "1.9.0-alpha10"]
-           [org.clojure/clojurescript "1.9.216"])
-  (:require [cljs.reader :as reader]
-            [clojure.string :as s]))
+#!/usr/bin/env python3.6
+import re
+import sys
 
-;; TODO assert that clj and cljs dep is provided in every call to :lein
-;; TODO assert that main/-main is defined
+starts = {'{', '[', '('}
+ends   = {'}', ']', ')'}
 
-(defn slurp
-  [path]
-  (.readFileSync (js/require "fs") path "utf-8"))
+def parse(tokens):
+    i, token = tokens.pop(0)
+    if token in starts:
+        result = [i, '']
+        openstr = False
+        while tokens[0][1] not in ends:
+            val = parse(tokens)
+            if isinstance(val, str):
+                if val == '"':
+                    openstr = not openstr
+                if not openstr and not val.strip() and not result[-1] == '':
+                    result.append('')
+                else:
+                    result[-1] += val
+            else:
+                result.append(val)
+        tokens.pop(0)
+        return [x for x in result if isinstance(x, list) or str(x).strip()]
+    elif token in ends:
+        raise Exception(f'unexpected {token}')
+    else:
+        return token.strip()
 
-(defn read-string
-  [text]
-  (let [buffer (-> text (s/replace #"#_" "") reader/push-back-reader)]
-    (loop [forms []]
-      (try
-        (recur (conj forms (reader/read buffer :throw-on-error)))
-        (catch :default ex
-          (if (not= "EOF while reading" (.-message ex))
-            (recur forms)
-            forms))))))
+def parse_all(tokens):
+    while tokens:
+        res = parse(tokens)
+        if res:
+            yield res
 
-(defn -main
-  [filepath key]
-  (let [key (reader/read-string key)
-        text (slurp filepath)]
-    (cond
-      (#{:npm :lein :require} key) (some->> (read-string text)
-                                     (filter seq?)
-                                     (filter #(= 'ns (first %)))
-                                     first
-                                     (filter list?)
-                                     (filter #(= key (first %)))
-                                     first
-                                     rest
-                                     (map prn)
-                                     dorun)
-      (#{:macro :source} key) (let [sum (atom 0)
-                                    forms (as-> text $
-                                            (map (fn [char]
-                                                   (condp = char
-                                                     \( 1
-                                                     \) -1
-                                                     0)) $)
-                                            (map vector (range) $ (map #(swap! sum + %) $))
-                                            (partition-by #(= [0 0] (rest %)) $)
-                                            (map (fn [x] [(ffirst x) (first (last x))]) $)
-                                            (map (fn [[start end]] (s/join "" (subvec (vec text) start (inc end)))) $))]
-                                (println
-                                 (s/join ""
-                                     (condp = key
-                                       :source  (for [form forms]
-                                                  (if (s/starts-with? (s/trim form) "(defmacro")
-                                                    (s/join "\n" (map #(str ";; " %) (s/split-lines form)))
-                                                    form))
-                                       :macro (cons "(ns main)\n" (for [form forms
-                                                                        :when (s/starts-with? (s/trim form) "(defmacro")]
-                                                                    form)))))))))
+def prettyprint(xs, i=0, j=1):
+    if isinstance(xs, list):
+        print(('\n' + '  ' * i if j else '') + '[', end='')
+        for j, x in enumerate(xs):
+            prettyprint(x, i + 1, j)
+        print(' ]', end='')
+    else:
+        print('', xs, end='')
+    if i == 0:
+        print()
+
+def search(xs, f):
+    for x in xs:
+        if isinstance(x, list):
+            if f(x):
+                return x
+            res = search(x, f)
+            if res:
+                return res
+
+def find_macros(res):
+    for i, r in enumerate(res):
+        if len(r) >= 2 and r[1] == 'defmacro':
+            yield r[0], res[i + 1][0]
+
+def quote(x):
+    if ';' in x.split('"')[0]:
+        return x.split(';')[0].strip() + '\n'
+    else:
+        return x
+
+if __name__ == '__main__':
+    path, token = sys.argv[1:]
+    with open(path) as f:
+        text = f.read()
+    text = '\n'.join(quote(x) for x in text.splitlines())
+    tokens = list(enumerate(text))
+    res = list(parse_all(tokens))
+    # prettyprint(res)
+
+    if token in [':npm', ':lein', ':require']:
+        xs = search(res, lambda x: len(x) >= 2 and x[1] == token)
+        if xs:
+            for x in xs[2:]:
+                print(str(x[1:]).replace("'", '').replace(',', ''))
+
+    elif token == ':macro':
+        print('(ns main)')
+        for j, k in find_macros(res):
+            print(text[j:k])
+
+    elif token == ':source':
+        for j, k in find_macros(res):
+            head = text[:j]
+            macro = text[j:k]
+            tail = text[k:]
+            macro = ';' + '\n;'.join(macro.strip().split('\n')) + '\n'
+            text = head + macro + tail
+
+        print(text)
