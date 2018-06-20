@@ -59,6 +59,7 @@ EOF
 }
 
 repl() {
+npm=$(cljs-deps $filepath :npm 2>/dev/null | tr -d '[]')
 cat <<EOF
 (ns repl
   (:require [cider.piggieback :refer [cljs-repl]]
@@ -70,6 +71,10 @@ cat <<EOF
              :output-dir "out-repl"
              :optimizations :none
              :cache-analysis true
+             :pretty-print true
+             :npm-deps '{$npm}
+             :install-deps true
+             :target :nodejs
              :source-map true))
 EOF
 }
