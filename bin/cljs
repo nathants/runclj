@@ -2,11 +2,10 @@
 set -euo pipefail
 
 filepath=$1
+shift
 root=$(cljs-root $filepath)
-if ls $root/release.js >/dev/null 2>&1; then
-    shift
-    node $root/release.js "$@"
-else
+
+build() {
     echo :root $root/ >&2
     if ! cljs-auto-status $filepath 2>/dev/null && [ ! -z "${clean:-}" ]; then
         echo :cleaned >&2
@@ -21,15 +20,35 @@ else
         echo :cached >&2
     elif cljs-auto-status $filepath 2>/dev/null; then
         echo :cljs-auto >&2
-        cljs-auto-wait "$@"
+        cljs-auto-wait "$filepath"
     else
         echo :cljs-once >&2
         cljs-once $filepath
     fi
     echo :stdout >&2
-    shift
     mv $root/out/dev.js $root/out/dev.js.tmp
     cat $root/out/dev.js.tmp | sed -r "s:path\.resolve\([^\)]+\):'$root':" > $root/out/dev.js
     rm $root/out/dev.js.tmp
-    node $root/dev.js "$@"
+}
+
+browser-mode() {
+    build
+    cd $root
+    ln -sf index.html.dev index.html
+    python3 -m http.server
+}
+
+server-mode() {
+    if ls $root/release.js &>/dev/null; then
+        node $root/release.js "$@"
+    else
+        build
+        node $root/dev.js "$@"
+    fi
+}
+
+if cljs-deps $filepath :browser-mode; then
+    browser-mode
+else
+    server-mode "$@"
 fi

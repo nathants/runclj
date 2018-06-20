@@ -25,3 +25,5 @@ fi
 cljs-hash $filepath > $root/hash
 
 kill -13 $!
+
+rm $root/*.tmp

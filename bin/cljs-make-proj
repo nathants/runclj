@@ -26,7 +26,31 @@ global.cljs_runner.run();
 EOF
 }
 
-project() {
+browser-project() {
+cat <<EOF
+(defproject $(basename $filepath) "0.0.1"
+  :dependencies [[cider/piggieback "0.3.6"] $(cljs-deps $filepath :lein 2>/dev/null)]
+  :plugins [[lein-cljsbuild "1.1.7"]]
+  :main repl
+  :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
+  :cljsbuild {:builds [{:id "dev"
+                        :source-paths ["src"]
+                        :compiler {:output-to "out/dev.js"
+                                   :output-dir "out"
+                                   :source-map true
+                                   :optimizations :none
+                                   :pretty-print true}}
+                       {:id "release"
+                        :source-paths ["src"]
+                        :compiler {:output-to "out-release/release.js"
+                                   :source-map "out-release/release.js.map"
+                                   :output-dir "out-release"
+                                   :optimizations :simple
+                                   :cache-analysis true}}]})
+EOF
+}
+
+server-project() {
 npm=$(cljs-deps $filepath :npm 2>/dev/null | tr -d '[]')
 cat <<EOF
 (defproject $(basename $filepath) "0.0.1"
@@ -63,10 +87,11 @@ npm=$(cljs-deps $filepath :npm 2>/dev/null | tr -d '[]')
 cat <<EOF
 (ns repl
   (:require [cider.piggieback :refer [cljs-repl]]
-            [cljs.repl.node :refer [repl-env]]))
+            [cljs.repl.node :as node]
+            [cljs.repl.browser :as browser]))
 (defn start-node-repl
   []
-  (cljs-repl (repl-env)
+  (cljs-repl (node/repl-env)
              :analyze-path "src"
              :output-dir "out-repl"
              :optimizations :none
@@ -76,26 +101,57 @@ cat <<EOF
              :install-deps true
              :target :nodejs
              :source-map true))
+(defn start-browser-repl
+  []
+  (cljs-repl (browser/repl-env)
+             :analyze-path "src"
+             :output-dir "out-repl"
+             :optimizations :none
+             :cache-analysis true
+             :pretty-print true
+             :source-map true))
 EOF
 }
 
-shell() {
+index-release() {
 cat <<EOF
-(ns shell
-  (:require [clojure.string :as s]))
+<html>
+    <body>
+        <div id="app"></div>
+        <script src="release.js" type="text/javascript"></script>
+        <script type="text/javascript">goog.require("main")</script>
+        <script type="text/javascript">main.run()</script>
+    </body>
+</html>
+EOF
+}
+
+index-dev() {
+cat <<EOF
+<html>
+    <body>
+        <div id="app"></div>
+        <script src="out/goog/base.js" type="text/javascript"></script>
+        <script src="out/dev.js" type="text/javascript"></script>
+        <script type="text/javascript">goog.require("main")</script>
+        <script type="text/javascript">main.run()</script>
+    </body>
+</html>
 EOF
 }
 
 mkdir -p $root/src
 
-runner > $root/src/cljs_runner.cljs.tmp
-mv -f $root/src/cljs_runner.cljs.tmp $root/src/cljs_runner.cljs
 
-repl > $root/src/repl.clj.tmp
-mv -f $root/src/repl.clj.tmp $root/src/repl.clj
+repl > $root/src/repl.clj
 
-dev > $root/dev.js.tmp
-mv -f $root/dev.js.tmp $root/dev.js
 
-project > $root/project.clj.tmp
-mv -f $root/project.clj.tmp $root/project.clj
+if cljs-deps $filepath :browser-mode; then
+    index-dev > $root/index.html.dev
+    index-release > $root/index.html.release
+    browser-project > $root/project.clj
+else
+    runner > $root/src/cljs_runner.cljs
+    dev > $root/dev.js
+    server-project > $root/project.clj
+fi

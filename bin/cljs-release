@@ -10,6 +10,8 @@ cd $root
 rm -f package.json*
 echo :recompiling >&2
 lein cljsbuild once release
-ls | grep -v -e out-release -e node_modules -e package.json -e package-lock.json | xargs rm -rf
 mv out-release/release.js* .
 rm -rf out-release
+if cljs-deps $filepath :browser-mode; then
+ln -sf $root/index.html.release $root/index.html
+fi
