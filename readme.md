@@ -32,11 +32,11 @@ cd runclj/examples
 
 ## examples
 
-- [client.cljs](./examples/client.cljs)
 - [hello.cljs](./examples/hello.cljs)
-- [macros.cljs](./examples/macros.cljs)
-- [server.cljs](./examples/server.cljs)
 - [shell.cljs](./examples/shell.cljs)
+- [server.cljs](./examples/server.cljs)
+- [client.cljs](./examples/client.cljs)
+- [macros.cljs](./examples/macros.cljs)
 
 ## usage
 
