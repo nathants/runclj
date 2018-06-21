@@ -12,15 +12,14 @@ cljs ./rotate_the_logs.cljs
 
 ## installation
 
-dependencies:
+get the dependencies:
 - bash
 - python3.6
 - java
 - leiningen
 - node
 
-simple install:
-- install the depedencies
+then:
 - `git clone https://github.com/nathants/runclj`
 - `mv runclj/bin/* /usr/local/bin`
 
@@ -29,7 +28,7 @@ simple install:
 - [hello.cljs](./examples/hello.cljs)
 - [shell.cljs](./examples/shell.cljs)
 - [server.cljs](./examples/server.cljs)
-- [client.cljs](./examples/client.cljs)
+- [client.cljs](./examples/client.cljs) [live](https://nathants.com/client.cljs/)
 - [macros.cljs](./examples/macros.cljs)
 
 ## usage
@@ -74,10 +73,14 @@ alternately, open `$(cljs-root shell.cljs)/project.clj` in your IDE and start yo
 
 ### deployment
 
-you can ship a script as a tarball which include all node_modules
+do a release
+
+`cljs-release shell.cljs`
+
+you can also ship a script as a tarball which include all node_modules
 
 ``` bash
-cljs-tar examples/shell.cljs > shell.tgz
+cljs-tar shell.cljs > shell.tgz
 scp shell.tgz ubuntu@remote:
 ssh ubuntu@remote tar xf shell.tgz
 ```
