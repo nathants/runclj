@@ -1,3 +1,4 @@
+#!/usr/bin/env cljs
 (ns main
   #_(:npm [express "4.16.3"])
   #_(:lein [org.clojure/clojure "1.9.0"]

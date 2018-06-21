@@ -1,3 +1,4 @@
+#!/usr/bin/env cljs
 (ns main
   #_ (:npm [source-map-support "0.5.6"])
   #_ (:lein [org.clojure/clojure "1.9.0"]

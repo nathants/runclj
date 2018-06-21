@@ -1,3 +1,4 @@
+#!/usr/bin/env cljs
 (ns main
   #_ :browser-mode
   #_ (:lein [org.clojure/clojure "1.9.0"]

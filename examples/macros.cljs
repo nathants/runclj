@@ -1,3 +1,4 @@
+#!/usr/bin/env cljs
 (ns main
   #_(:lein [org.clojure/clojure "1.9.0"]
            [org.clojure/clojurescript "1.10.238"])
