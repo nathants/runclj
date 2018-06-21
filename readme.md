@@ -12,23 +12,17 @@ cljs ./rotate_the_logs.cljs
 
 ## installation
 
-depends on:
+dependencies:
 - bash
 - python3.6
 - java
-- lein
+- leiningen
 - node
 
-a demo [setup](https://github.com/nathants/bootstraps/blob/aa1c119d0182784199e425bad810ee53fb97ca64/ubuntu/scripts/runclj.sh/) on ubuntu via [ec2](https://github.com/nathants/py-aws/tree/7f436794e3cfaeeb6da3e85d457307e2eef442c2). also works on macos but setup is more manual, see above dependencies.
-
-``` bash
-ec2 new cljs-testbox --ami xenial --type m4.large --spot 1.0 --login # py-aws
-git clone https://github.com/nathants/bootstraps
-git checkout 730cc1d
-cd boostraps/scripts
-bash runclj.sh
-cd runclj/examples
-```
+simple install:
+- install the depedencies
+- `git clone https://github.com/nathants/runclj`
+- `mv runclj/bin/* /usr/local/bin`
 
 ## examples
 
