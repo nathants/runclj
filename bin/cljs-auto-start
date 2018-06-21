@@ -7,7 +7,6 @@ if ! cljs-auto-status $filepath 2>/dev/null; then
     cljs-make-proj $filepath
     cljs-update $filepath
     cd $root
-    rm -f package.json*
     nohup bash -c 'lein trampoline cljsbuild auto dev 2>&1 | tee >(grep --line-buffered "Successfully compiled" > compiled.log) > compiler.log 2>&1' &>/dev/null &
     echo :cljsbuild :auto >&2
     echo $! > cljs-auto.pid

@@ -3,5 +3,6 @@ set -euo pipefail
 filepath=$1
 cljs-release $filepath
 name=$(basename $filepath)
-cd $(cljs-root $filepath)/..
-tar czf - $name
+cd $(cljs-root $filepath)/../..
+root=.lein/$name
+tar czf - $name $root/release.js* $root/package*.json $root/node_modules/

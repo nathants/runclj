@@ -18,6 +18,7 @@ EOF
 dev(){
 cat <<EOF
 #!/usr/bin/env node
+process.chdir(__dirname)
 try { require('source-map-support').install(); } catch(e) {};
 require("$root/out/goog/bootstrap/nodejs");
 require("$root/out/dev.js");
@@ -142,9 +143,7 @@ EOF
 
 mkdir -p $root/src
 
-
 repl > $root/src/repl.clj
-
 
 if cljs-deps $filepath :browser-mode; then
     index-dev > $root/index.html.dev
@@ -155,3 +154,5 @@ else
     dev > $root/dev.js
     server-project > $root/project.clj
 fi
+
+rm -f $root/package*.json
