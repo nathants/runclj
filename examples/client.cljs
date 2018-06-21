@@ -51,6 +51,6 @@
     ["(.*)" not-found]]))
 
 (defn run []
-  (repl/connect "http://localhost:9000/repl")
+  ;; (repl/connect "http://localhost:9000/repl")
   (bide/start! router {:default home :on-navigate #(swap! state assoc :page %) :html5? false})
   (reagent/render [root] (js/document.getElementById "app")))

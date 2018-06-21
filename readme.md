@@ -69,6 +69,8 @@ to force a lein project level rebuild:
 
 you can use a repl as an alternative to just running the script with `cljs`. start the repl with `cljs-repl shell.cljs`, jack-in to the nrepl on the port it printed, then call the function `(start-node-repl)`.
 
+for client code, use `(start-browser-repl)` and uncomment the repl line in the clients `run` function.
+
 alternately, open `$(cljs-root shell.cljs)/project.clj` in your IDE and start your repl some other way.
 
 ### deployment
