@@ -6,7 +6,7 @@ root=$(cljs-root $filepath)
 echo :releasing >&2
 cljs-make-proj $filepath
 cljs-update $filepath
-if cljs-deps $filepath :browser-mode; then
+if cljs-deps $filepath :browser-mode &>/dev/null; then
     ln -sf $root/index.html.release $root/index.html
 fi
 cd $root
