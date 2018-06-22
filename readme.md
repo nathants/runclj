@@ -28,7 +28,7 @@ then:
 - [hello.cljs](./examples/hello.cljs)
 - [shell.cljs](./examples/shell.cljs)
 - [server.cljs](./examples/server.cljs)
-- [client.cljs](./examples/client.cljs) [live](https://nathants.com/client.cljs/)
+- [client.cljs](./examples/client.cljs) deployed: [live](https://nathants.com/client.cljs/)
 - [macros.cljs](./examples/macros.cljs)
 
 ## usage
