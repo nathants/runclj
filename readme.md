@@ -43,7 +43,7 @@ if it has already been compiled, it can also be run as:
 node $(cljs-root shell.cljs)/dev.js # this resolves to: .lein/shell.cljs/dev.js
 ```
 
-you declare you clojure and npm dependencies with meta-data at the start of the file.
+you declare clojure and npm dependencies with meta-data at the start of the file.
 
 ``` clojure
 #!/usr/bin/env cljs
@@ -53,7 +53,7 @@ you declare you clojure and npm dependencies with meta-data at the start of the 
   (:require [schema.core :as schema :include-macros true]))
 ```
 
-`cljs` is converting a single clojurescript file into a temporary leiningen project in `.lein/`.
+`cljs` is converting a single clojurescript file into a temporary leiningen project in `.lein/`
 
 `cljs` will recompile if the source has changed. use auto mode for faster iteration.
 
@@ -66,11 +66,11 @@ cljs-auto-stop shell.cljs # stop the background lein process
 to force a lein project level rebuild:
 
 - use an env variable `clean=y cljs shell.cljs`
-- or `rm -rf $(cljs-root shell.cljs)`.
+- or `rm -rf $(cljs-root shell.cljs)`
 
-you can use a repl as an alternative to just running the script with `cljs`. start the repl with `cljs-repl shell.cljs`, jack-in to the nrepl on the port it printed, then call the function `(start-node-repl)`.
+you can use a repl as an alternative to just running the script with `cljs`. start the repl with `cljs-repl shell.cljs`, jack-in to the nrepl on the printed port, then call the function `(start-node-repl)`.
 
-for client code, use `(start-browser-repl)` and uncomment the repl line in the clients `run` function.
+for client code, use `(start-browser-repl)` and uncomment the repl line in the clients `-main` function.
 
 alternately, open `$(cljs-root shell.cljs)/project.clj` in your IDE and start your repl some other way.
 
@@ -98,4 +98,11 @@ or cljs
 
 ```bash
 ssh ubuntu@remote cljs shell.cljs
+```
+
+for client code, start a web server to serve `index.html` and `release.js`
+
+```bash
+cd .lein/client.cljs
+python3 -m http.server
 ```
