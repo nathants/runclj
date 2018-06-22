@@ -34,7 +34,7 @@ cat <<EOF
                         :compiler {:output-to "out-release/release.js"
                                    :source-map "out-release/release.js.map"
                                    :output-dir "out-release"
-                                   :optimizations :simple
+                                   :optimizations :advanced
                                    :cache-analysis true}}]})
 EOF
 }
