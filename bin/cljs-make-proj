@@ -108,7 +108,6 @@ cat <<EOF
     <body>
         <div id="app"></div>
         <script src="release.js" type="text/javascript" charset="utf-8"></script>
-        <script type="text/javascript">goog.require("cljs_runner")</script>
     </body>
 </html>
 EOF
