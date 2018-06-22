@@ -1,6 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-
 filepath=$1
 shift
 root=$(cljs-root $filepath)

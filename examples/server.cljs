@@ -1,8 +1,8 @@
 #!/usr/bin/env cljs
-(ns main
-  #_(:npm [express "4.16.3"])
-  #_(:lein [org.clojure/clojure "1.9.0"]
-           [org.clojure/clojurescript "1.10.238"]))
+^{:runclj {:npm [[express "4.16.3"]]
+           :lein [[org.clojure/clojure "1.9.0"]
+                  [org.clojure/clojurescript "1.10.238"]]}}
+(ns main)
 
 (def port 8000)
 

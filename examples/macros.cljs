@@ -1,7 +1,7 @@
 #!/usr/bin/env cljs
+^{:runclj {:lein [[org.clojure/clojure "1.9.0"]
+                  [org.clojure/clojurescript "1.10.238"]]}}
 (ns main
-  #_(:lein [org.clojure/clojure "1.9.0"]
-           [org.clojure/clojurescript "1.10.238"])
   (:require-macros [main :refer [twice]]))
 
 (defmacro twice

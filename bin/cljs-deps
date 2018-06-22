@@ -64,27 +64,42 @@ def quote(x):
     else:
         return x
 
+def chunk(val, chunk_size):
+    res = []
+    for x in val:
+        res.append(x)
+        if len(res) == chunk_size:
+            yield res
+            res = []
+    if res:
+        yield res
+
 if __name__ == '__main__':
     if len(sys.argv) != 3:
-        print('usage: cljs-deps $file.cljs :lein|:npm|:macro|:source|:browser-mode')
+        print('usage: cljs-deps <file.cljs> <:lein|:npm|:macro|:source|:browser-mode>')
+        sys.exit(1)
     path, token = sys.argv[1:]
     with open(path) as f:
         text = f.read()
     text = '\n'.join(quote(x) for x in text.splitlines())
     tokens = list(enumerate(text))
     res = list(parse_all(tokens))
-    # prettyprint(res)
+    _n, _token, meta = search(res, lambda x: (isinstance(x, list) and len(x) >= 2 and x[1] == ':runclj'))
+    meta = meta[1:]
+    meta = chunk(meta, 2)
+    meta = dict(meta)
 
     if token in [':npm', ':lein', ':require']:
-        xs = search(res, lambda x: (isinstance(x, list)
-                                    and len(x) >= 2
-                                    and x[1] == token))
-        if xs:
-            for x in xs[2:]:
-                print(str(x[1:]).replace("'", '').replace(',', ''))
+        try:
+            meta = meta[token]
+        except KeyError:
+            pass
+        else:
+            for m in meta[1:]:
+                print(str(m[1:]).replace("'", '').replace(',', ''))
 
     elif token.endswith('-mode'):
-        if search(res, lambda x: x == token):
+        if meta.get(token) == 'true':
             print(token, file=sys.stderr)
         else:
             sys.exit(1)

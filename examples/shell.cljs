@@ -1,10 +1,10 @@
 #!/usr/bin/env cljs
+^{:runclj {:npm [[source-map-support "0.5.6"]
+                 [prompt "1.0.0"]]
+           :lein [[org.clojure/clojure "1.9.0"]
+                  [org.clojure/core.async "0.4.474"]
+                  [org.clojure/clojurescript "1.10.312"]]}}
 (ns main
-  #_ (:npm [source-map-support "0.5.6"]
-           [prompt "1.0.0"])
-  #_ (:lein [org.clojure/clojure "1.9.0"]
-            [org.clojure/core.async "0.4.474"]
-            [org.clojure/clojurescript "1.10.312"])
   (:require [clojure.string :as s]
             [clojure.pprint :as pp]
             [cljs.core.async :as a :refer [go >! <! put! take! chan]]))
