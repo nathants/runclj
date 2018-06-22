@@ -32,7 +32,7 @@
    [(:page @state)]])
 
 (defn home []
-  [:div "home page"])
+  [:p "home page"])
 
 (defn page1 []
   [:div
