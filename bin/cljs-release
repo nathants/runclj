@@ -7,7 +7,7 @@ echo :releasing >&2
 cljs-make-proj $filepath
 cljs-update $filepath
 if cljs-deps $filepath :browser-mode &>/dev/null; then
-    ln -sf $root/index.html.release $root/index.html
+    cp -f $root/index.html.release $root/index.html
 fi
 cd $root
 echo :recompiling >&2

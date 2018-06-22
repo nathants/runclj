@@ -33,7 +33,7 @@ build() {
 browser-mode() {
     build
     cd $root
-    ln -sf index.html.dev index.html
+    cp -f index.html.dev index.html
     python3 -m http.server
 }
 

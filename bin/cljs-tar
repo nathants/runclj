@@ -5,4 +5,17 @@ cljs-release $filepath
 name=$(basename $filepath)
 cd $(cljs-root $filepath)/../..
 root=.lein/$name
-tar czf - $name $root/release.js* $root/package*.json $root/node_modules/
+paths_that_exist() {
+    for path in "$@"; do
+        if ls $path &>/dev/null; then
+            echo $path
+        fi
+    done
+}
+tar czf - $(paths_that_exist \
+                $name \
+                $root/release.js \
+                $root/package.json \
+                $root/package-lock.json \
+                $root/node_modules \
+                $root/index.html)
