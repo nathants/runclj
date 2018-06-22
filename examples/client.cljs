@@ -5,7 +5,7 @@
                   [garden "1.3.5"]
                   [funcool/bide "1.6.0"]
                   [reagent "0.8.2-SNAPSHOT"]]}}
-(ns main
+(ns client
   (:require [reagent.core :as reagent]
             [bide.core :as bide]
             [garden.core :as garden]
@@ -50,7 +50,7 @@
     ["/page1" page1]
     ["(.*)" not-found]]))
 
-(defn run []
+(defn -main []
   ;; (repl/connect "http://localhost:9000/repl")
   (bide/start! router {:default home :on-navigate #(swap! state assoc :page %) :html5? false})
   (reagent/render [root] (js/document.getElementById "app")))

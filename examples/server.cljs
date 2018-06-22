@@ -2,7 +2,7 @@
 ^{:runclj {:npm [[express "4.16.3"]]
            :lein [[org.clojure/clojure "1.9.0"]
                   [org.clojure/clojurescript "1.10.238"]]}}
-(ns main)
+(ns server)
 
 (def port 8000)
 

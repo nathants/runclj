@@ -43,12 +43,13 @@ if it has already been compiled, it can also be run as:
 node $(cljs-root shell.cljs)/dev.js # this resolves to: .lein/shell.cljs/dev.js
 ```
 
-you declare you clojure and npm dependencies with comments in the namespace block.
+you declare you clojure and npm dependencies with meta-data at the start of the file.
 
 ``` clojure
+#!/usr/bin/env cljs
+^{:runclj {:npm [[express "4.16.3"]]
+           :lein [[prismatic/schema "1.1.3"]]}}
 (ns main
-  #_(:npm [express "4.16.3"])
-  #_(:lein [prismatic/schema "1.1.3"])
   (:require [schema.core :as schema :include-macros true]))
 ```
 

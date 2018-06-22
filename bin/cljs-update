@@ -3,5 +3,6 @@ set -euo pipefail
 filepath=$1
 root=$(cljs-root $filepath)
 src=$root/src
-cljs-deps $filepath :macro > $src/main.clj
-cljs-deps $filepath :source > $src/main.cljs
+ns=$(cljs-deps $filepath :ns)
+cljs-deps $filepath :macro > $src/$ns.clj
+cljs-deps $filepath :source > $src/$ns.cljs

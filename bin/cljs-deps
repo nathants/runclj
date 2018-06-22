@@ -104,8 +104,12 @@ if __name__ == '__main__':
         else:
             sys.exit(1)
 
+    elif token == ':ns':
+        print(search(res, lambda x: (isinstance(x, list) and len(x) >= 2 and x[1] == 'ns'))[2])
+
     elif token == ':macro':
-        print('(ns main)')
+        ns = search(res, lambda x: (isinstance(x, list) and len(x) >= 2 and x[1] == 'ns'))[2]
+        print(f'(ns {ns})')
         for j, k in find_macros(res):
             print(text[j:k])
 
@@ -117,3 +121,7 @@ if __name__ == '__main__':
             macro = ';' + '\n;'.join(macro.strip().split('\n')) + '\n'
             text = head + macro + tail
         print(text)
+
+    else:
+        print('unknown token:', token)
+        sys.exit(1)

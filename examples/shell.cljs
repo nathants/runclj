@@ -4,7 +4,7 @@
            :lein [[org.clojure/clojure "1.9.0"]
                   [org.clojure/core.async "0.4.474"]
                   [org.clojure/clojurescript "1.10.312"]]}}
-(ns main
+(ns shell
   (:require [clojure.string :as s]
             [clojure.pprint :as pp]
             [cljs.core.async :as a :refer [go >! <! put! take! chan]]))

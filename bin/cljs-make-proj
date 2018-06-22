@@ -41,6 +41,7 @@ EOF
 
 server-project() {
 npm=$(cljs-deps $filepath :npm 2>/dev/null | tr -d '[]')
+ns=$(cljs-deps $filepath :ns)
 cat <<EOF
 (defproject $(basename $filepath) "0.0.1"
   :dependencies [[cider/piggieback "0.3.6"] $(cljs-deps $filepath :lein 2>/dev/null)]
@@ -53,7 +54,7 @@ cat <<EOF
                                    :output-dir "out"
                                    :source-map true
                                    :optimizations :none
-                                   :main "main"
+                                   :main "$ns"
                                    :pretty-print true
                                    :npm-deps {$npm}
                                    :install-deps true
@@ -127,21 +128,23 @@ EOF
 }
 
 browser-runner() {
+ns=$(cljs-deps $filepath :ns)
 cat <<EOF
 (ns cljs-runner
-  (:require [main :as main]))
-(main/run)
+  (:require [$ns :as $ns]))
+($ns/-main)
 EOF
 }
 
 server-runner(){
+ns=$(cljs-deps $filepath :ns)
 cat <<EOF
 (ns cljs-runner
-  (:require [main :as main]
+  (:require [$ns :as $ns]
             [cljs.nodejs :as nodejs]))
 (nodejs/enable-util-print!)
 (defn run [& _]
-  (apply main/-main (drop 2 (.-argv js/process))))
+  (apply $ns/-main (drop 2 (.-argv js/process))))
 (set! *main-cli-fn* run)
 EOF
 }
