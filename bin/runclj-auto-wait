@@ -5,20 +5,21 @@ root=$(runclj-root $filepath)
 echo :recompiling >&2
 tail -n0 -f $root/compiler.log >&2 &
 
+name=$(basename $filepath | cut -d. -f1)
 src=$(runclj-root $filepath)/src
-runclj-deps $filepath :macro > $root/main.clj.tmp
-runclj-deps $filepath :source > $root/main.cljs.tmp
+runclj-deps $filepath :macro > $root/$name.clj.tmp
+runclj-deps $filepath :source > $root/$name.cljs.tmp
 
-if [ "$(cat $root/main.clj.tmp | shasum)" != "$(cat $src/main.clj | shasum)" ]; then
+if [ "$(cat $root/$name.clj.tmp | shasum)" != "$(cat $src/$name.clj | shasum)" ]; then
     echo :clj-source >&2
-    mv -f $root/main.clj.tmp $src/main.clj
+    mv -f $root/$name.clj.tmp $src/$name.clj
     now=$(cat $root/compiled.log|wc -l)
     while true; do [ "$now" != "$(cat $root/compiled.log|wc -l)" ] && break; sleep .025; done
 
-elif [ "$(cat $root/main.cljs.tmp | shasum)" != "$(cat $src/main.cljs | shasum)" ]; then
+elif [ "$(cat $root/$name.cljs.tmp | shasum)" != "$(cat $src/$name.cljs | shasum)" ]; then
     echo :cljs-source >&2
     now=$(cat $root/compiled.log|wc -l)
-    mv -f $root/main.cljs.tmp $src/main.cljs
+    mv -f $root/$name.cljs.tmp $src/$name.cljs
     while true; do [ "$now" != "$(cat $root/compiled.log|wc -l)" ] && break; sleep .025; done
 fi
 
