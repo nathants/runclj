@@ -1,8 +1,0 @@
-#!/bin/bash
-set -euo pipefail
-filepath=$1
-root=$(cljs-root $filepath)
-src=$root/src
-ns=$(cljs-deps $filepath :ns)
-cljs-deps $filepath :macro > $src/$ns.clj
-cljs-deps $filepath :source > $src/$ns.cljs

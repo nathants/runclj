@@ -1,13 +1,13 @@
 #!/bin/bash
 set -euo pipefail
 filepath=$1
-root=$(cljs-root $filepath)
+root=$(runclj-root $filepath)
 echo :recompiling >&2
 tail -n0 -f $root/compiler.log >&2 &
 
-src=$(cljs-root $filepath)/src
-cljs-deps $filepath :macro > $root/main.clj.tmp
-cljs-deps $filepath :source > $root/main.cljs.tmp
+src=$(runclj-root $filepath)/src
+runclj-deps $filepath :macro > $root/main.clj.tmp
+runclj-deps $filepath :source > $root/main.cljs.tmp
 
 if [ "$(cat $root/main.clj.tmp | shasum)" != "$(cat $src/main.clj | shasum)" ]; then
     echo :clj-source >&2
@@ -22,7 +22,7 @@ elif [ "$(cat $root/main.cljs.tmp | shasum)" != "$(cat $src/main.cljs | shasum)"
     while true; do [ "$now" != "$(cat $root/compiled.log|wc -l)" ] && break; sleep .025; done
 fi
 
-cljs-hash $filepath > $root/hash
+runclj-hash $filepath > $root/hash
 
 kill -13 $!
 

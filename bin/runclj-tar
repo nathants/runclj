@@ -1,9 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 filepath=$1
-cljs-release $filepath
+runclj-release $filepath
 name=$(basename $filepath)
-cd $(cljs-root $filepath)/../..
+cd $(runclj-root $filepath)/../..
 root=.lein/$name
 paths_that_exist() {
     for path in "$@"; do

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 filepath=$1
-root=$(cljs-root $filepath)
+root=$(runclj-root $filepath)
 
 dev(){
 cat <<EOF
@@ -18,7 +18,7 @@ EOF
 browser-project() {
 cat <<EOF
 (defproject $(basename $filepath) "0.0.1"
-  :dependencies [[cider/piggieback "0.3.6"] $(cljs-deps $filepath :lein 2>/dev/null)]
+  :dependencies [[cider/piggieback "0.3.6"] $(runclj-deps $filepath :lein 2>/dev/null)]
   :plugins [[lein-cljsbuild "1.1.7"]]
   :main repl
   :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
@@ -40,11 +40,11 @@ EOF
 }
 
 server-project() {
-npm=$(cljs-deps $filepath :npm 2>/dev/null | tr -d '[]')
-ns=$(cljs-deps $filepath :ns)
+npm=$(runclj-deps $filepath :npm 2>/dev/null | tr -d '[]')
+ns=$(runclj-deps $filepath :ns)
 cat <<EOF
 (defproject $(basename $filepath) "0.0.1"
-  :dependencies [[cider/piggieback "0.3.6"] $(cljs-deps $filepath :lein 2>/dev/null)]
+  :dependencies [[cider/piggieback "0.3.6"] $(runclj-deps $filepath :lein 2>/dev/null)]
   :plugins [[lein-cljsbuild "1.1.7"]]
   :main repl
   :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
@@ -73,7 +73,7 @@ EOF
 }
 
 repl() {
-npm=$(cljs-deps $filepath :npm 2>/dev/null | tr -d '[]')
+npm=$(runclj-deps $filepath :npm 2>/dev/null | tr -d '[]')
 cat <<EOF
 (ns repl
   (:require [cider.piggieback :refer [cljs-repl]]
@@ -128,7 +128,7 @@ EOF
 }
 
 browser-runner() {
-ns=$(cljs-deps $filepath :ns)
+ns=$(runclj-deps $filepath :ns)
 cat <<EOF
 (ns cljs-runner
   (:require [$ns :as $ns]))
@@ -137,7 +137,7 @@ EOF
 }
 
 server-runner(){
-ns=$(cljs-deps $filepath :ns)
+ns=$(runclj-deps $filepath :ns)
 cat <<EOF
 (ns cljs-runner
   (:require [$ns :as $ns]
@@ -153,7 +153,7 @@ mkdir -p $root/src
 
 repl > $root/src/repl.clj
 
-if cljs-deps $filepath :browser-mode; then
+if runclj-deps $filepath :browser-mode; then
     index-dev > $root/index.html.dev
     index-release > $root/index.html.release
     browser-runner > $root/src/cljs_runner.cljs

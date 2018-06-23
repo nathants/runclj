@@ -1,4 +1,4 @@
-#!/usr/bin/env cljs
+#!/usr/bin/env runclj
 ^{:runclj {:browser-mode true
            :lein [[org.clojure/clojure "1.9.0"]
                   [org.clojure/clojurescript "1.10.312"]

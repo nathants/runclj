@@ -1,11 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 filepath=$1
-root=$(cljs-root $filepath)
-now=$(cljs-hash $filepath)
+root=$(runclj-root $filepath)
+now=$(runclj-hash $filepath)
 echo :recompiling >&2
-cljs-make-proj $filepath
-cljs-update $filepath
+runclj-make-proj $filepath
+runclj-update $filepath
 cd $root
 lein cljsbuild once dev
 echo "$now" > hash

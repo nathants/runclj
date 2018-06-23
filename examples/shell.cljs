@@ -1,4 +1,4 @@
-#!/usr/bin/env cljs
+#!/usr/bin/env runclj
 ^{:runclj {:npm [[source-map-support "0.5.6"]
                  [prompt "1.0.0"]]
            :lein [[org.clojure/clojure "1.9.0"]

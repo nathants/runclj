@@ -76,7 +76,7 @@ def chunk(val, chunk_size):
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
-        print('usage: cljs-deps <file.cljs> <:lein|:npm|:macro|:source|:browser-mode>')
+        print('usage: runclj-deps <file.cljs> <:lein|:npm|:macro|:source|:browser-mode>')
         sys.exit(1)
     path, token = sys.argv[1:]
     with open(path) as f:

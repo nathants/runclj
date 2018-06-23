@@ -1,15 +1,15 @@
 #!/bin/bash
 set -euo pipefail
 filepath=$1
-root=$(cljs-root $filepath)
-if ! cljs-auto-status $filepath 2>/dev/null; then
+root=$(runclj-root $filepath)
+if ! runclj-auto-status $filepath 2>/dev/null; then
     echo :auto-starting >&2
-    cljs-make-proj $filepath
-    cljs-update $filepath
+    runclj-make-proj $filepath
+    runclj-update $filepath
     cd $root
     nohup bash -c 'lein trampoline cljsbuild auto dev 2>&1 | tee >(grep --line-buffered "Successfully compiled" > compiled.log) > compiler.log 2>&1' &>/dev/null &
     echo :cljsbuild :auto >&2
-    echo $! > cljs-auto.pid
+    echo $! > runclj-auto.pid
     while true; do
         if [ -f out/dev.js ]; then
             break
@@ -17,4 +17,4 @@ if ! cljs-auto-status $filepath 2>/dev/null; then
         sleep .1
     done
 fi
-echo :auto-running $(cat $root/cljs-auto.pid) >&2
+echo :auto-running $(cat $root/runclj-auto.pid) >&2

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 if [ ! -z "${cljs_root:-}" ]; then
-    filepath=$cljs_root
+    filepath=$runclj_root
 else
     filepath=$1
 fi

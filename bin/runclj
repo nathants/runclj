@@ -2,27 +2,27 @@
 set -euo pipefail
 filepath=$1
 shift
-root=$(cljs-root $filepath)
+root=$(runclj-root $filepath)
 
 build() {
     echo :root $root/ >&2
-    if ! cljs-auto-status $filepath 2>/dev/null && [ ! -z "${clean:-}" ]; then
+    if ! runclj-auto-status $filepath 2>/dev/null && [ ! -z "${clean:-}" ]; then
         echo :cleaned >&2
         rm -rf "$root"
     fi
     if [ ! -z "${auto:-}" ]; then
-        cljs-auto-start $filepath
+        runclj-auto-start $filepath
     fi
-    source_hash=$(cljs-hash $filepath)
+    source_hash=$(runclj-hash $filepath)
     compiled_hash=$(cat $root/hash 2>/dev/null || echo '')
     if [ ! -z "${usecached:-}" ] || [ "$source_hash" == "$compiled_hash" ]; then
         echo :cached >&2
-    elif cljs-auto-status $filepath 2>/dev/null; then
+    elif runclj-auto-status $filepath 2>/dev/null; then
         echo :cljs-auto >&2
-        cljs-auto-wait "$filepath"
+        runclj-auto-wait "$filepath"
     else
         echo :cljs-once >&2
-        cljs-once $filepath
+        runclj-once $filepath
     fi
     echo :stdout >&2
     mv $root/out/dev.js $root/out/dev.js.tmp
@@ -46,7 +46,7 @@ server-mode() {
     fi
 }
 
-if cljs-deps $filepath :browser-mode; then
+if runclj-deps $filepath :browser-mode; then
     browser-mode
 else
     server-mode "$@"

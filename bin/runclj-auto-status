@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 filepath=$1
-pid=$(cat $(cljs-root $filepath)/cljs-auto.pid 2>/dev/null || echo "")
+pid=$(cat $(runclj-root $filepath)/runclj-auto.pid 2>/dev/null || echo "")
 if [ ! -z "$pid" ] && ps $pid >/dev/null; then
     echo :auto-running $pid >&2
     exit 0

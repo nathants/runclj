@@ -7,7 +7,7 @@ some tooling around single file clojurescript *scripts* running on node or the b
 run a *.cljs file like it was a *.py file.
 
 ``` bash
-cljs ./rotate_the_logs.cljs
+runclj ./rotate_the_logs.cljs
 ```
 
 ## installation
@@ -34,56 +34,56 @@ then:
 ## usage
 
 ``` bash
-cljs shell.cljs
+runclj shell.cljs
 ```
 
 if it has already been compiled, it can also be run as:
 
 ``` bash
-node $(cljs-root shell.cljs)/dev.js # this resolves to: .lein/shell.cljs/dev.js
+node $(runclj-root shell.cljs)/dev.js # this resolves to: .lein/shell.cljs/dev.js
 ```
 
 you declare clojure and npm dependencies with meta-data at the start of the file.
 
 ``` clojure
-#!/usr/bin/env cljs
+#!/usr/bin/env runclj
 ^{:runclj {:npm [[express "4.16.3"]]
            :lein [[prismatic/schema "1.1.3"]]}}
 (ns main
   (:require [schema.core :as schema :include-macros true]))
 ```
 
-`cljs` is converting a single clojurescript file into a temporary leiningen project in `.lein/`
+`runclj` is converting a single clojurescript file into a temporary leiningen project in `.lein/`
 
-`cljs` will recompile if the source has changed. use auto mode for faster iteration.
+`runclj` will recompile if the source has changed. use auto mode for faster iteration.
 
 ``` bash
-auto=y cljs shell.cljs # auto compiler boots on the first call
-cljs shell.cljs # fast compiles!
-cljs-auto-stop shell.cljs # stop the background lein process
+auto=y runclj shell.cljs # auto compiler boots on the first call
+runclj shell.cljs # fast compiles!
+runclj-auto-stop shell.cljs # stop the background lein process
 ```
 
 to force a lein project level rebuild:
 
-- use an env variable `clean=y cljs shell.cljs`
-- or `rm -rf $(cljs-root shell.cljs)`
+- use an env variable `clean=y runclj shell.cljs`
+- or `rm -rf $(runclj-root shell.cljs)`
 
-you can use a repl as an alternative to just running the script with `cljs`. start the repl with `cljs-repl shell.cljs`, jack-in to the nrepl on the printed port, then call the function `(start-node-repl)`.
+you can use a repl as an alternative to just running the script with `runclj`. start the repl with `runclj-repl shell.cljs`, jack-in to the nrepl on the printed port, then call the function `(start-node-repl)`.
 
 for client code, use `(start-browser-repl)` and uncomment the repl line in the clients `-main` function.
 
-alternately, open `$(cljs-root shell.cljs)/project.clj` in your IDE and start your repl some other way.
+alternately, open `$(runclj-root shell.cljs)/project.clj` in your IDE and start your repl some other way.
 
 ### deployment
 
 do a release
 
-`cljs-release shell.cljs`
+`runclj-release shell.cljs`
 
 you can also ship a script as a tarball which include all node_modules
 
 ``` bash
-cljs-tar shell.cljs > shell.tgz
+runclj-tar shell.cljs > shell.tgz
 scp shell.tgz ubuntu@remote:
 ssh ubuntu@remote tar xf shell.tgz
 ```
@@ -94,10 +94,10 @@ run with node
 ssh ubuntu@remote node .lein/shell.cljs/release.js
 ```
 
-or cljs
+or runclj
 
 ```bash
-ssh ubuntu@remote cljs shell.cljs
+ssh ubuntu@remote runclj shell.cljs
 ```
 
 for client code, start a web server to serve `index.html` and `release.js`

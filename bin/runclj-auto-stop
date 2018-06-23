@@ -1,9 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 filepath=$1
-pid=$(cat $(cljs-root $filepath)/cljs-auto.pid 2>/dev/null || echo "")
+pid=$(cat $(runclj-root $filepath)/runclj-auto.pid 2>/dev/null || echo "")
 if [ ! -z "$pid" ]; then
     pkill --signal 9 -P $pid &>/dev/null
     kill -9 $pid &>/dev/null
 fi
-cljs-auto-status $filepath
+runclj-auto-status $filepath
