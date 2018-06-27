@@ -7,7 +7,7 @@ if ! runclj-auto-status $filepath 2>/dev/null; then
     runclj-make-proj $filepath
     runclj-update $filepath
     cd $root
-    nohup bash -c 'lein trampoline cljsbuild auto dev 2>&1 | tee >(grep --line-buffered "Successfully compiled" > compiled.log) > compiler.log 2>&1' &>/dev/null &
+    nohup bash -c 'lein cljsbuild auto dev 2>&1 | tee >(grep --line-buffered "Successfully compiled" > compiled.log) > compiler.log 2>&1' &
     echo :cljsbuild :auto >&2
     echo $! > runclj-auto.pid
     while true; do

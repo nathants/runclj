@@ -34,8 +34,7 @@ cat <<EOF
                         :compiler {:output-to "out-release/release.js"
                                    :source-map "out-release/release.js.map"
                                    :output-dir "out-release"
-                                   :optimizations :advanced
-                                   :cache-analysis true}}]})
+                                   :optimizations :advanced}}]})
 EOF
 }
 
@@ -65,7 +64,6 @@ cat <<EOF
                                    :source-map "out-release/release.js.map"
                                    :output-dir "out-release"
                                    :optimizations :simple
-                                   :cache-analysis true
                                    :npm-deps {$npm}
                                    :install-deps true
                                    :target :nodejs}}]})
@@ -85,7 +83,6 @@ cat <<EOF
              :analyze-path "src"
              :output-dir "out-repl"
              :optimizations :none
-             :cache-analysis true
              :pretty-print true
              :npm-deps '{$npm}
              :install-deps true
@@ -97,7 +94,6 @@ cat <<EOF
              :analyze-path "src"
              :output-dir "out-repl"
              :optimizations :none
-             :cache-analysis true
              :pretty-print true
              :source-map true))
 EOF
