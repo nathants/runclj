@@ -5,4 +5,4 @@ if [ ! -z "${cljs_root:-}" ]; then
 else
     filepath=$1
 fi
-python3.6 -c "import os; print(os.path.abspath('$(dirname $filepath)/.lein/$(basename $filepath)'))"
+python3 -c "import os; print(os.path.abspath('$(dirname $filepath)/.lein/$(basename $filepath)'))"

@@ -14,7 +14,7 @@ runclj ./rotate_the_logs.cljs
 
 get the dependencies:
 - bash
-- python3.6
+- python3
 - java
 - leiningen
 - node
