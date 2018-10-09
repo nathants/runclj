@@ -3,7 +3,7 @@
                  [prompt "1.0.0"]]
            :lein [[org.clojure/clojure "1.9.0"]
                   [org.clojure/core.async "0.4.474"]
-                  [org.clojure/clojurescript "1.10.312"]]}}
+                  [org.clojure/clojurescript "1.10.339"]]}}
 (ns shell
   (:require [clojure.string :as s]
             [clojure.pprint :as pp]

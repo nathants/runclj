@@ -1,10 +1,10 @@
 #!/usr/bin/env runclj
 ^{:runclj {:browser-mode true
            :lein [[org.clojure/clojure "1.9.0"]
-                  [org.clojure/clojurescript "1.10.312"]
-                  [garden "1.3.5"]
+                  [org.clojure/clojurescript "1.10.339"]
+                  [garden "1.3.6"]
                   [funcool/bide "1.6.0"]
-                  [reagent "0.8.2-SNAPSHOT"]]}}
+                  [reagent "0.8.1"]]}}
 (ns client
   (:require [reagent.core :as reagent]
             [bide.core :as bide]

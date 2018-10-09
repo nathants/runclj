@@ -2,6 +2,8 @@
 set -euo pipefail
 filepath=$1
 root=$(runclj-root $filepath)
+piggieback=0.3.9
+cljsbuild=1.1.7
 
 dev(){
 cat <<EOF
@@ -18,8 +20,8 @@ EOF
 browser-project() {
 cat <<EOF
 (defproject $(basename $filepath) "0.0.1"
-  :dependencies [[cider/piggieback "0.3.6"] $(runclj-deps $filepath :lein 2>/dev/null)]
-  :plugins [[lein-cljsbuild "1.1.7"]]
+  :dependencies [[cider/piggieback "$piggieback"] $(runclj-deps $filepath :lein 2>/dev/null)]
+  :plugins [[lein-cljsbuild "$cljsbuild"]]
   :main repl
   :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
   :cljsbuild {:builds [{:id "dev"
@@ -43,8 +45,8 @@ npm=$(runclj-deps $filepath :npm 2>/dev/null | tr -d '[]')
 ns=$(runclj-deps $filepath :ns)
 cat <<EOF
 (defproject $(basename $filepath) "0.0.1"
-  :dependencies [[cider/piggieback "0.3.6"] $(runclj-deps $filepath :lein 2>/dev/null)]
-  :plugins [[lein-cljsbuild "1.1.7"]]
+  :dependencies [[cider/piggieback "$piggieback"] $(runclj-deps $filepath :lein 2>/dev/null)]
+  :plugins [[lein-cljsbuild "$cljsbuild"]]
   :main repl
   :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
   :cljsbuild {:builds [{:id "dev"
