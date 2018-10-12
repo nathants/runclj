@@ -68,11 +68,15 @@ to force a lein project level rebuild:
 - use an env variable `clean=y runclj shell.cljs`
 - or `rm -rf $(runclj-root shell.cljs)`
 
-you can use a repl as an alternative to just running the script with `runclj`. start the repl with `runclj-repl shell.cljs`, jack-in to the nrepl on the printed port, then call the function `(start-node-repl)`.
+you can use a repl as an alternative to just running the script with `runclj`. open `$(runclj-root shell.cljs)/project.clj` in your IDE and start your repl.
 
-for client code, use `(start-browser-repl)` and uncomment the repl line in the clients `-main` function.
+then call the function `(start-node-repl)`, or for client code uncomment the repl line in the client's `-main` function and call the function `(start-browser-repl)`.
 
-alternately, open `$(runclj-root shell.cljs)/project.clj` in your IDE and start your repl some other way.
+### repl free workflow for client code
+
+if you don't like using a repl, and can tolerate a slightly slower update that clears all state, the following works well:
+
+`ls client.cljs | entr -r bash -c 'auto=y runclj client.cljs & while true; do curl localhost:8000 --connect-timeout 0.01 &>/dev/null && break; done && chromium http://localhost:8000 --new-window'`
 
 ### deployment
 
