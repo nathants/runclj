@@ -9,12 +9,11 @@ if ! runclj-auto-status $filepath 2>/dev/null; then
     cd $root
     nohup bash -c 'lein cljsbuild auto dev 2>&1 | tee >(grep --line-buffered "Successfully compiled" > compiled.log) > compiler.log 2>&1' &
     echo :cljsbuild :auto >&2
-    echo $! > runclj-auto.pid
     while true; do
         if [ -f out/dev.js ]; then
             break
         fi
-        sleep .1
+        sleep .01
     done
 fi
-echo :auto-running $(cat $root/runclj-auto.pid) >&2
+echo :auto-running
