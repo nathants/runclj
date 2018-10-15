@@ -2,7 +2,7 @@
 set -euo pipefail
 filepath=$1
 root=$(runclj-root $filepath)
-if ! runclj-auto-status $filepath 2>/dev/null; then
+if ! runclj-auto-status $filepath &>/dev/null; then
     echo :auto-starting >&2
     runclj-make-proj $filepath
     runclj-update $filepath

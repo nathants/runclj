@@ -11,7 +11,8 @@
             [garden.core :as garden]
             [clojure.browser.repl :as repl]))
 
-(do
+(do ;; this do block has a `(-main)` call at the end, for the browser
+  ;; repl worksflow. if you aren't using a repl you can drop this.
 
   (defonce state
     (reagent/atom
@@ -52,12 +53,11 @@
       ["/page1" page1]
       ["(.*)" not-found]]))
 
-  (defn render []
+  (defn -main []
+    (defonce repl (repl/connect "http://localhost:9000/repl"))
+    (bide/start! router {:default home :on-navigate #(swap! state assoc :page %) :html5? false})
     (reagent/render [root] (js/document.getElementById "app")))
 
-  (defn -main []
-    (repl/connect "http://localhost:9000/repl")
-    (bide/start! router {:default home :on-navigate #(swap! state assoc :page %) :html5? false})
-    (render))
+  (-main) ;; trigger react for browser repl workflow
 
-  (render))
+  )

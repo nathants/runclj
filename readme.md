@@ -1,4 +1,4 @@
-# cljs. putting the *scripting* back in clojurescript.
+# runclj. putting the *scripting* back in clojurescript.
 
 ## what
 
@@ -68,15 +68,23 @@ to force a lein project level rebuild:
 - use an env variable `clean=y runclj shell.cljs`
 - or `rm -rf $(runclj-root shell.cljs)`
 
-you can use a repl as an alternative to just running the script with `runclj`. open `$(runclj-root shell.cljs)/project.clj` in your IDE and start your repl.
+you can use a repl as an alternative to just running the script with `runclj`. open `$(runclj-root shell.cljs)/project.clj` in your IDE and start your clojure repl.
 
-then call the function `(start-node-repl)`, or for client code uncomment the repl line in the client's `-main` function and call the function `(start-browser-repl)`.
+then call the function `(start-node-repl)`, or for client code uncomment a few lines in `client.cljs`, then call the function `(start-browser-repl)`.
 
 ### repl free workflow for client code
 
-if you don't like using a repl, and can tolerate a slightly slower update that clears all state, the following works well:
+if you don't like using a repl, can tolerate a slower update that clears all state, and have installed [entr](http://www.entrproject.org/), the following bash snippet works well:
 
-`ls client.cljs | entr -r bash -c 'auto=y runclj client.cljs & while true; do curl localhost:8000 --connect-timeout 0.01 &>/dev/null && break; done && chromium http://localhost:8000 --new-window'`
+```bash
+path=client.cljs
+rm -rf $(runclj-root $path)
+runclj-auto-stop $path
+runclj-auto-start $path
+ls $path | entr -r runclj $path
+```
+
+this snippet watches for changes in the source file and recompiles. assuming your editor auto saves when it loses focus, modify the code, alt tab to your browser, and hit reload.
 
 ### deployment
 

@@ -6,7 +6,7 @@ root=$(runclj-root $filepath)
 
 build() {
     echo :root $root/ >&2
-    if ! runclj-auto-status $filepath 2>/dev/null && [ ! -z "${clean:-}" ]; then
+    if ! runclj-auto-status $filepath &>/dev/null && [ ! -z "${clean:-}" ]; then
         echo :cleaned >&2
         rm -rf "$root"
     fi
@@ -17,7 +17,7 @@ build() {
     compiled_hash=$(cat $root/hash 2>/dev/null || echo '')
     if [ ! -z "${usecached:-}" ] || [ "$source_hash" == "$compiled_hash" ]; then
         echo :cached >&2
-    elif runclj-auto-status $filepath 2>/dev/null; then
+    elif runclj-auto-status $filepath &>/dev/null; then
         echo :cljs-auto >&2
         runclj-auto-wait "$filepath"
     else
