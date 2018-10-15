@@ -2,7 +2,7 @@
 set -euo pipefail
 filepath=$1
 root=$(runclj-root $filepath)
-piggieback=0.3.9
+piggieback=0.3.6
 cljsbuild=1.1.7
 
 dev(){
