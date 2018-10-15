@@ -11,46 +11,53 @@
             [garden.core :as garden]
             [clojure.browser.repl :as repl]))
 
-(defonce state
-  (reagent/atom
-   {:page home
-    :page1 {:state 0}}))
+(do
 
-(def style
-  (garden/css
-   [:p {:font-size "16px"}]
-   [:a {:margin "5px" :color "purple"}]))
+  (defonce state
+    (reagent/atom
+     {:page home
+      :page1 {:state 0}}))
 
-(defn root []
-  [:div
-   [:style style]
-   [:p
-    [:a {:href "#/"} "home"]
-    [:a {:href "#/page1"} "page 1"]
-    [:a {:href "#/nothing-to-see/here"} "broken link"]]
-   [:hr]
-   [(:page @state)]])
+  (def style
+    (garden/css
+     [:p {:font-size "16px"}]
+     [:a {:margin "5px" :color "purple"}]))
 
-(defn home []
-  [:p "home page"])
+  (defn root []
+    [:div
+     [:style style]
+     [:p
+      [:a {:href "#/"} "home"]
+      [:a {:href "#/page1"} "page 1"]
+      [:a {:href "#/nothing-to-see/here"} "broken link"]]
+     [:hr]
+     [(:page @state)]])
 
-(defn page1 []
-  [:div
-   [:p "this is a page with some data: " (-> @state :page1 :state)]
-   [:p [:input {:type "button"
-                :value "push me"
-                :on-click #(swap! state update-in [:page1 :state] inc)}]]])
+  (defn home []
+    [:p "home page"])
 
-(defn not-found []
-  [:p "404"])
+  (defn page1 []
+    [:div
+     [:p "this is a page with some data: " (-> @state :page1 :state)]
+     [:p [:input {:type "button"
+                  :value "push me"
+                  :on-click #(swap! state update-in [:page1 :state] inc)}]]])
 
-(def router
-  (bide/router
-   [["/" home]
-    ["/page1" page1]
-    ["(.*)" not-found]]))
+  (defn not-found []
+    [:p "404"])
 
-(defn -main []
-  ;; (repl/connect "http://localhost:9000/repl")
-  (bide/start! router {:default home :on-navigate #(swap! state assoc :page %) :html5? false})
-  (reagent/render [root] (js/document.getElementById "app")))
+  (def router
+    (bide/router
+     [["/" home]
+      ["/page1" page1]
+      ["(.*)" not-found]]))
+
+  (defn render []
+    (reagent/render [root] (js/document.getElementById "app")))
+
+  (defn -main []
+    (repl/connect "http://localhost:9000/repl")
+    (bide/start! router {:default home :on-navigate #(swap! state assoc :page %) :html5? false})
+    (render))
+
+  (render))

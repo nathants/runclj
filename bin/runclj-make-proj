@@ -20,7 +20,9 @@ EOF
 browser-project() {
 cat <<EOF
 (defproject $(basename $filepath) "0.0.1"
-  :dependencies [[cider/piggieback "$piggieback"] $(runclj-deps $filepath :lein 2>/dev/null)]
+  :dependencies [[cider/piggieback "$piggieback"]
+                 $(runclj-deps $filepath :lein 2>/dev/null)
+                ]
   :plugins [[lein-cljsbuild "$cljsbuild"]]
   :main repl
   :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
