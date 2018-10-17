@@ -3,6 +3,6 @@ set -euo pipefail
 filepath=$1
 root=$(runclj-root $filepath)
 src=$root/src
-ns=$(runclj-deps $filepath :ns)
+ns=$(runclj-deps $filepath :ns | tr '-' '_')
 runclj-deps $filepath :macro > $src/$ns.clj
 runclj-deps $filepath :source > $src/$ns.cljs
