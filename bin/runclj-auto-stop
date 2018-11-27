@@ -1,6 +1,6 @@
 #!/bin/bash
-set -euo pipefail
 filepath=$1
+
 for pid in $(runclj-auto-status $filepath | awk '{print $2}'); do
     if [ ! -z "$pid" ]; then
         pkill --signal 9 -P $pid &>/dev/null

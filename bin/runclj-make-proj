@@ -106,6 +106,7 @@ EOF
 index-release() {
 cat <<EOF
 <html>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'/>
     <body>
         <div id="app"></div>
         <script src="release.js" type="text/javascript" charset="utf-8"></script>
@@ -117,6 +118,7 @@ EOF
 index-dev() {
 cat <<EOF
 <html>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'/>
     <body>
         <div id="app"></div>
         <script src="out/goog/base.js" type="text/javascript" charset="utf-8"></script>
