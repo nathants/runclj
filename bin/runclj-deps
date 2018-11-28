@@ -9,19 +9,23 @@ def parse(tokens):
     if token in starts:
         result = [i, '']
         openstr = False
-        while tokens[0][1] not in ends:
-            val = parse(tokens)
-            if isinstance(val, str):
-                if val == '"':
-                    openstr = not openstr
-                if not openstr and not val.strip() and not result[-1] == '':
-                    result.append('')
+        try:
+            while tokens[0][1] not in ends:
+                val = parse(tokens)
+                if isinstance(val, str):
+                    if val == '"':
+                        openstr = not openstr
+                    if not openstr and not val.strip() and not result[-1] == '':
+                        result.append('')
+                    else:
+                        result[-1] += val
                 else:
-                    result[-1] += val
-            else:
-                result.append(val)
-        tokens.pop(0)
-        return [x for x in result if isinstance(x, list) or str(x).strip()]
+                    result.append(val)
+            tokens.pop(0)
+        except IndexError:
+            pass
+        else:
+            return [x for x in result if isinstance(x, list) or str(x).strip()]
     elif token in ends:
         raise Exception(f'unexpected {token}')
     else:
