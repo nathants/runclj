@@ -1,7 +1,7 @@
 #!/usr/bin/env runclj
 ^{:runclj {:browser-mode true
            :lein [[org.clojure/clojure "1.9.0"]
-                  [org.clojure/clojurescript "1.10.339"]
+                  [org.clojure/clojurescript "1.10.439"]
                   [garden "1.3.6"]
                   [funcool/bide "1.6.0"]
                   [reagent "0.8.1"]]}}
@@ -54,7 +54,7 @@
       ["(.*)" not-found]]))
 
   (defn -main []
-    (defonce repl (repl/connect "http://localhost:9000/repl"))
+    ;; (repl/connect "http://localhost:9000/repl")
     (bide/start! router {:default home :on-navigate #(swap! state assoc :page %) :html5? false})
     (reagent/render [root] (js/document.getElementById "app")))
 
