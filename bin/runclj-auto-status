@@ -1,4 +1,4 @@
 #!/bin/bash
 set -euo pipefail
 filepath=$1
-ps -efww | grep -e java -e lein | grep "$(runclj-root $filepath)"
+ps -efww | grep -e java -e lein | grep -v refactor-nrepl | grep "$(runclj-root $filepath)"

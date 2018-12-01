@@ -5,7 +5,7 @@ filepath=$1
 root=$(runclj-root $filepath)
 echo :releasing >&2
 runclj-make-proj $filepath
-runclj-update $filepath
+release=y runclj-update $filepath
 if runclj-deps $filepath :browser-mode &>/dev/null; then
     cp -f $root/index.html.release $root/index.html
 fi
