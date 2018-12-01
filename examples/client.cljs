@@ -55,7 +55,7 @@
 
   (defn -main []
     (defonce repl (repl/connect "http://localhost:9000/repl"))
-    (bide/start! router {:default home :on-navigate #(swap! state assoc :page %) :html5? false})
+    (defonce router (bide/start! router {:default home :on-navigate #(swap! state assoc :page %) :html5? false}))
     (reagent/render [root] (js/document.getElementById "app")))
 
   (-main) ;; trigger react for browser repl workflow
