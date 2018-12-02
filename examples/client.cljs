@@ -48,14 +48,13 @@
     [:p "404"])
 
   (def router
-    (bide/router
-     [["/" home]
-      ["/page1" page1]
-      ["(.*)" not-found]]))
+    [["/" home]
+     ["/page1" page1]
+     ["(.*)" not-found]])
 
   (defn -main []
     (defonce repl (repl/connect "http://localhost:9000/repl")) ;; localhost for laptop, or an ipv4 address to repl against a mobile browser
-    (bide/start! router {:default home :on-navigate #(swap! state assoc :page %) :html5? false})
+    (bide/start! (bide/router router) {:default home :on-navigate #(swap! state assoc :page %) :html5? false})
     (reagent/render [root] (js/document.getElementById "app")))
 
   (-main) ;; trigger react for browser repl workflow
