@@ -1,4 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 filepath=$1
-ps -efww | grep -e java -e lein | grep -v refactor-nrepl | grep "$(runclj-root $filepath)"
+pid=$(cat $(runclj-root $filepath)/runclj-auto.pid 2>/dev/null || echo "")
+if [ ! -z "$pid" ] && ps $pid >/dev/null; then
+    echo :auto-running $pid >&2
+    exit 0
+else
+    echo :auto-stopped >&2
+    exit 1
+fi
