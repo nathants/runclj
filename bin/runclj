@@ -33,9 +33,20 @@ build() {
 
 browser-mode() {
     build
+    orig=$(pwd)
     cd $root
     cp -f index.html.dev index.html
-    python3 -m http.server
+    if [ "${browser:-}" != n ]; then
+        if [ -n "${callback:-}" ]; then
+            python3 -m http.server &
+            pid=$!
+            (cd $orig
+             bash -c "${callback:-}")
+            kill $pid
+        else
+            python3 -m http.server
+        fi
+    fi
 }
 
 server-mode() {
