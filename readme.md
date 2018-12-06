@@ -55,13 +55,11 @@ you declare clojure and npm dependencies with meta-data at the start of the file
 
 `runclj` is converting a single clojurescript file into a temporary leiningen project in `.lein/`
 
-`runclj` will recompile if the source has changed. use auto mode for faster iteration.
+`runclj` will recompile if the source has changed. start the auto compiler for faster iteration.
 
-``` bash
-auto=y runclj shell.cljs # auto compiler boots on the first call
-runclj shell.cljs # fast compiles!
-runclj-auto-stop shell.cljs # stop the background lein process
-```
+in terminal 1: `runclj-auto-start shell.cljs`
+
+in terminal 2: `runclj shell.cljs`
 
 to force a lein project level rebuild:
 
@@ -76,19 +74,15 @@ then call the function `(start-node-repl)`, or for client code `(start-browser-r
 
 if you don't like using a repl, can tolerate a slower update that clears all state, and have installed [entr](http://www.entrproject.org/), the following bash snippet works well:
 
-```bash
-path=client.cljs
-rm -rf $(runclj-root $path)
-runclj-auto-stop $path
-runclj-auto-start $path
-ls $path | entr -r runclj $path
-```
+in terminal 1: `runclj-auto-start $path`
 
-alternatively:
+in terminal 2: `ls shell.cljs | entr -r runclj $path`
 
-`ls $path | auto=y entr -r runclj $path`
+if you want to run a test suite after every compile, try something like this instead:
 
-this snippet watches for changes in the source file and recompiles. assuming your editor auto saves when it loses focus, modify the code, alt tab to your browser, and hit reload.
+`ls shell.cljs | callback="bash ./test.sh" entr -r runclj $path`
+
+`entr` watches for changes in the source file and recompiles. assuming your editor automatically saves when it loses focus, modify the code, alt tab to your browser, and hit reload.
 
 ### deployment
 

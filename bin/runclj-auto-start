@@ -1,20 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 filepath=$1
-root=$(runclj-root $filepath)
-if ! runclj-auto-status $filepath &>/dev/null; then
-    echo :auto-starting >&2
-    runclj-make-proj $filepath
-    runclj-update $filepath
-    cd $root
-    nohup bash -c 'lein cljsbuild auto dev 2>&1 | tee >(grep --line-buffered "Successfully compiled" > compiled.log) > compiler.log 2>&1' &
-    echo :cljsbuild :auto >&2
-    echo $! > runclj-auto.pid
-    while true; do
-        if [ -f out/dev.js ]; then
-            break
-        fi
-        sleep .01
-    done
-fi
-echo :auto-running
+echo :auto-starting >&2
+runclj-make-proj $filepath
+runclj-update $filepath
+cd $(runclj-root $filepath)
+echo :cljsbuild :auto >&2
+echo $$ > runclj-auto.pid
+lein cljsbuild auto dev 2>&1 | tee >(grep --line-buffered "Successfully compiled" > compiled.log)

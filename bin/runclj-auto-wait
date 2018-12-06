@@ -3,7 +3,6 @@ set -euo pipefail
 filepath=$1
 root=$(runclj-root $filepath)
 echo :recompiling >&2
-tail -n0 -f $root/compiler.log >&2 &
 
 name=$(basename $filepath | cut -d. -f1)
 src=$(runclj-root $filepath)/src
@@ -24,7 +23,4 @@ elif [ "$(cat $root/$name.cljs.tmp | shasum)" != "$(cat $src/$name.cljs | shasum
 fi
 
 runclj-hash $filepath > $root/hash
-
-kill -13 $!
-
 rm $root/*.tmp
