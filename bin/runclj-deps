@@ -2,38 +2,34 @@
 import sys
 
 starts = {'{', '[', '('}
-ends   = {'}', ']', ')'}
+ends = {'}', ']', ')'}
 
-def parse(tokens):
+def parse(openstr, tokens):
     i, token = tokens.pop(0)
-    if token in starts:
+    if token in starts and not openstr:
         result = [i, '']
-        openstr = False
-        try:
-            while tokens[0][1] not in ends:
-                val = parse(tokens)
-                if isinstance(val, str):
-                    if val == '"':
-                        openstr = not openstr
-                    if not openstr and not val.strip() and not result[-1] == '':
-                        result.append('')
-                    else:
-                        result[-1] += val
+        while tokens[0][1] not in ends:
+            openstr, val = parse(openstr, tokens)
+            if isinstance(val, str):
+                if val == '"': # should be aware of escaped quote, ie \", should skip
+                    openstr = not openstr
+                if not openstr and not val.strip() and not result[-1] == '':
+                    result.append('')
                 else:
-                    result.append(val)
-            tokens.pop(0)
-        except IndexError:
-            pass
-        else:
-            return [x for x in result if isinstance(x, list) or str(x).strip()]
-    elif token in ends:
+                    result[-1] += val
+            else:
+                result.append(val)
+        tokens.pop(0)
+        return openstr, [x for x in result if isinstance(x, list) or str(x).strip()]
+    elif token in ends and not openstr:
         raise Exception(f'unexpected {token}')
     else:
-        return token.strip()
+        return openstr, token.strip()
 
 def parse_all(tokens):
+    openstr = False
     while tokens:
-        res = parse(tokens)
+        openstr, res = parse(openstr, tokens)
         if res:
             yield res
 
@@ -88,7 +84,11 @@ if __name__ == '__main__':
     text = '\n'.join(quote(x) for x in text.splitlines())
     tokens = list(enumerate(text))
     res = list(parse_all(tokens))
-    _n, _token, meta = search(res, lambda x: (isinstance(x, list) and len(x) >= 2 and x[1] == ':runclj'))
+    try:
+        _n, _token, meta = search(res, lambda x: (isinstance(x, list) and len(x) >= 2 and x[1] == ':runclj'))
+    except TypeError:
+        print('error: you need a ^{:runclj} above your (ns), see https://github.com/nathants/runclj/blob/master/readme.md', file=sys.stderr)
+        sys.exit(1)
     meta = meta[1:]
     meta = chunk(meta, 2)
     meta = dict(meta)
@@ -118,13 +118,17 @@ if __name__ == '__main__':
             print(text[j:k])
 
     elif token == ':source':
+        new_text = ''
+        i = 0
         for j, k in find_macros(res):
-            head = text[:j]
+            head = text[i:j]
             macro = text[j:k]
             tail = text[k:]
-            macro = ';' + '\n;'.join(macro.strip().split('\n')) + '\n'
-            text = head + macro + tail
-        print(text)
+            macro = '\n'.join([';; ' + x if x.strip() else x for x in macro.split('\n')])
+            new_text += head + macro
+            i = k
+        new_text += tail
+        print(new_text)
 
     else:
         print('unknown token:', token)
