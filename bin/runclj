@@ -37,8 +37,12 @@ browser-mode() {
         if [ -n "${callback:-}" ]; then
             python3 -m http.server &
             pid=$!
-            (cd $orig
-             bash -c "${callback:-}")
+            (
+                cd $orig
+                set +e
+                bash -c "$callback"
+                echo exited: $?
+            )
             kill $pid
         else
             python3 -m http.server
