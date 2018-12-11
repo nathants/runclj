@@ -22,6 +22,7 @@ build() {
         runclj-once $filepath
     fi
     echo :stdout >&2
+    mkdir -p $root/out/
     touch $root/out/dev.js
     mv $root/out/dev.js $root/out/dev.js.tmp
     cat $root/out/dev.js.tmp | sed -r "s:path\.resolve\([^\)]+\):'$root':" > $root/out/dev.js
