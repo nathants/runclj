@@ -109,8 +109,7 @@ CACHE MANIFEST
 # $(cat /proc/sys/kernel/random/uuid)
 
 CACHE:
-index.html
-release.js
+*
 
 NETWORK:
 *
