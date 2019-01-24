@@ -1,6 +1,6 @@
 #!/usr/bin/env runclj
 ^{:runclj {:browser-mode true
-           :lein [[org.clojure/clojure "1.9.0"]
+           :lein [[org.clojure/clojure "1.10.0"]
                   [org.clojure/clojurescript "1.10.439"]
                   [garden "1.3.6"]
                   [funcool/bide "1.6.0"]

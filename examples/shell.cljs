@@ -1,9 +1,9 @@
 #!/usr/bin/env runclj
 ^{:runclj {:npm [[source-map-support "0.5.6"]
                  [prompt "1.0.0"]]
-           :lein [[org.clojure/clojure "1.9.0"]
+           :lein [[org.clojure/clojure "1.10.0"]
                   [org.clojure/core.async "0.4.474"]
-                  [org.clojure/clojurescript "1.10.339"]]}}
+                  [org.clojure/clojurescript "1.10.439"]]}}
 (ns shell
   (:require [clojure.string :as s]
             [clojure.pprint :as pp]

@@ -1,6 +1,6 @@
 #!/usr/bin/env runclj
-^{:runclj {:lein [[org.clojure/clojure "1.9.0"]
-                  [org.clojure/clojurescript "1.10.339"]]}}
+^{:runclj {:lein [[org.clojure/clojure "1.10.0"]
+                  [org.clojure/clojurescript "1.10.439"]]}}
 (ns macros
   (:require-macros [macros :refer [twice]]))
 
