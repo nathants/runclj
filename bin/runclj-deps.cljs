@@ -1,5 +1,5 @@
 #!/usr/bin/env runclj
-^{:runclj {:lein [[org.clojure/clojure "1.9.0"]
+^{:runclj {:lein [[org.clojure/clojure "1.10.0"]
                   [org.clojure/clojurescript "1.10.439"]
                   [org.clojure/tools.reader "1.3.2"]]}}
 (ns runclj-deps
@@ -23,9 +23,9 @@
           lines (if (s/starts-with? (first lines) "#!") (rest lines) lines)
           text (s/join "\n" lines)
           reader (rt/source-logging-push-back-reader text)
-          forms (->> #(r/read {:eof ::runclj-deps-stop} reader)
+          forms (->> #(r/read {:eof :runclj-deps-stop} reader)
                   repeatedly
-                  (take-while #(not= % ::runclj-deps-stop)))]
+                  (take-while #(not= % :runclj-deps-stop)))]
       (cond
         (#{:npm :lein} key) (->> forms
                               (filter #(= 'ns (first %)))

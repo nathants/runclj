@@ -3,6 +3,7 @@ set -euo pipefail
 filepath=$1
 [ ! -z "${clean:-}" ] && echo :cleaned >&2 && rm -rf "$(runclj-root $filepath)"
 root=$(runclj-root $filepath)
+now=$(runclj-hash $filepath)
 echo :releasing >&2
 runclj-make-proj $filepath
 release=y runclj-update $filepath
@@ -13,3 +14,4 @@ cd $root
 echo :recompiling >&2
 lein cljsbuild once release 1>&2
 mv out-release/release.js* .
+echo "$now" > hash
