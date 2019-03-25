@@ -68,6 +68,8 @@ to force a lein project level rebuild:
 
 you can use a repl as an alternative to just running the script with `runclj`. open `$(runclj-root shell.cljs)/project.clj` in your IDE and start your clojure repl.
 
+note: when using `cider` you probably want to use `sesman-link-with-buffer` to associate your source file with the new repl.
+
 then call the function `(start-node-repl)`, or for client code `(start-browser-repl)` which launches a new browser window in your default browser.
 
 ### repl free workflow for client code
