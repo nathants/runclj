@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 filepath=$1
-runclj-release $filepath
+runclj-release $filepath >&2
 name=$(basename $filepath)
 cd $(runclj-root $filepath)/../..
 root=.lein/$name
@@ -14,6 +14,7 @@ paths_that_exist() {
 }
 tar czf - $(paths_that_exist \
                 $name \
+                $(runclj-deps $filepath :static | while read path; do echo $root/$(basename $path); done) \
                 $root/release.js \
                 $root/package.json \
                 $root/package-lock.json \

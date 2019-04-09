@@ -9,6 +9,10 @@ runclj-make-proj $filepath
 release=y runclj-update $filepath
 if runclj-deps $filepath :browser-mode &>/dev/null; then
     cp -f $root/index.html.release $root/index.html
+    file_root=$(dirname $(realpath $filepath))
+    runclj-deps $filepath :static | while read static; do
+        cp -fv $file_root/$static $root
+    done
 fi
 cd $root
 echo :recompiling >&2

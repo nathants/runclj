@@ -31,6 +31,10 @@ build() {
 
 browser-mode() {
     build
+    file_root=$(dirname $(realpath $filepath))
+    runclj-deps $filepath :static | while read static; do
+        cp -fv $file_root/$static $root
+    done
     orig=$(pwd)
     cd $root
     cp -f index.html.dev index.html

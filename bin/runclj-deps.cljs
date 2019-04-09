@@ -25,55 +25,63 @@
           reader (rt/source-logging-push-back-reader text)
           forms (->> #(r/read {:eof :runclj-deps-stop} reader)
                   repeatedly
-                  (take-while #(not= % :runclj-deps-stop)))]
+                  (take-while #(not= % :runclj-deps-stop)))
+          runclj (->> forms
+                   (filter #(= 'ns (first %)))
+                   first
+                   meta
+                   :runclj)]
       (cond
-        (#{:npm :lein} key) (->> forms
-                              (filter #(= 'ns (first %)))
-                              first
-                              meta
-                              :runclj
-                              key
-                              (map pr)
-                              dorun)
-        (= :require key) (->> forms
-                           (filter #(= 'ns (first %)))
-                           first
-                           (filter seq?)
-                           (filter #(= key (first %)))
-                           first
-                           rest
-                           (map pr)
-                           dorun)
-        (= "mode" (second (s/split (name key) "-"))) (->> forms
-                                                       (filter #(= 'ns (first %)))
-                                                       first
-                                                       meta
-                                                       :runclj
-                                                       key
-                                                       (get {true 0 false 1 nil 1})
-                                                       js/process.exit)
-        (= :source key) (as-> forms $
-                          (map #(assoc (meta %) :term (first %)) $)
-                          (map #(dissoc % :runclj) $)
-                          (map #(if (= 'defmacro (:term %))
-                                  (update-in % [:source]
-                                             (fn [x]
-                                               (s/join "\n"
-                                                   (map (fn [x]
-                                                          (str ";; " x))
-                                                        (s/split-lines x)))))
-                                  %) $)
-                          (map :source $)
-                          (map #(println % "\n") $)
-                          (dorun $))
-        (= :macro key) (do (->> forms (filter #(= 'ns (first %))) first (take 2) println)
-                           (println)
-                           (as-> forms $
-                             (map #(assoc (meta %) :term (first %)) $)
-                             (map #(dissoc % :runclj) $)
-                             (filter #(= 'defmacro (:term %)) $)
-                             (map :source $)
-                             (map #(println % "\n") $)
-                             (dorun $)))
-        (= :ns key) (->> forms (filter #(= 'ns (first %))) first second println)
-        :else (println "unkown cmd:" key)))))
+
+        (= :static key)
+        (->> runclj key (map println) dorun)
+
+        (#{:npm :lein} key)
+        (->> runclj key (map pr) dorun)
+
+        (= "mode" (second (s/split (name key) "-")))
+        (->> runclj key (get {true 0 false 1 nil 1}) js/process.exit)
+
+        (= :require key)
+        (->> forms
+          (filter #(= 'ns (first %)))
+          first
+          (filter seq?)
+          (filter #(= key (first %)))
+          first
+          rest
+          (map pr)
+          dorun)
+
+        (= :source key)
+        (as-> forms $
+          (map #(assoc (meta %) :term (first %)) $)
+          (map #(dissoc % :runclj) $)
+          (map #(if (= 'defmacro (:term %))
+                  (update-in % [:source]
+                             (fn [x]
+                               (s/join "\n"
+                                   (map (fn [x]
+                                          (str ";; " x))
+                                        (s/split-lines x)))))
+                  %) $)
+          (map :source $)
+          (map #(println % "\n") $)
+          (dorun $))
+
+        (= :macro key)
+        (do (->> forms (filter #(= 'ns (first %))) first (take 2) println)
+            (println)
+            (as-> forms $
+              (map #(assoc (meta %) :term (first %)) $)
+              (map #(dissoc % :runclj) $)
+              (filter #(= 'defmacro (:term %)) $)
+              (map :source $)
+              (map #(println % "\n") $)
+              (dorun $)))
+
+        (= :ns key)
+        (->> forms (filter #(= 'ns (first %))) first second println)
+
+        :else
+        (println "unkown cmd:" key)))))
