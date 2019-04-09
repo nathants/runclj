@@ -64,6 +64,10 @@ server-mode() {
     fi
 }
 
+trap 'kill $(jobs -p)' EXIT
+touch $root/compiler.log
+tail -f $root/compiler.log &
+
 if runclj-deps $filepath :browser-mode; then
     browser-mode
 else
