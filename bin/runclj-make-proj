@@ -32,12 +32,14 @@ cat <<EOF
                                    :output-dir "out"
                                    :source-map true
                                    :optimizations :none
+                                   :parallel-build true
                                    :pretty-print true}}
                        {:id "release"
                         :source-paths ["src"]
                         :compiler {:output-to "out-release/release.js"
                                    :source-map "out-release/release.js.map"
                                    :output-dir "out-release"
+                                   :parallel-build true
                                    :optimizations :advanced}}]})
 EOF
 }
