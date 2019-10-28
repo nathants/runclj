@@ -9,14 +9,6 @@
             [clojure.pprint :as pp]
             [cljs.core.async :as a :refer [go >! <! put! take! chan]]))
 
-(defn slurp
-  [path]
-  (.readFileSync (js/require "fs") path "utf-8"))
-
-(defn spit
-  [path text]
-  (.writeFileSync (js/require "fs") path text))
-
 (defn run
   [& cmd]
   (let [[cb cmd] (if (fn? (first cmd))

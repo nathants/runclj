@@ -2,7 +2,7 @@
 set -euo pipefail
 filepath=$1
 root=$(runclj-root $filepath)
-piggieback=0.3.6
+piggieback=0.4.2
 cljsbuild=1.1.7
 
 dev(){
@@ -161,6 +161,7 @@ cat <<EOF
             [cljs.nodejs :as nodejs]))
 (nodejs/enable-util-print!)
 (defn run [& _]
+  (process.chdir "$(dirname $(realpath $filepath))")
   (apply $ns/-main (drop 2 (.-argv js/process))))
 (set! *main-cli-fn* run)
 EOF

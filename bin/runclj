@@ -65,6 +65,7 @@ server-mode() {
 }
 
 trap 'kill $(jobs -p)' EXIT
+mkdir -p $root
 touch $root/compiler.log
 tail -f $root/compiler.log &
 
