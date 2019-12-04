@@ -23,6 +23,7 @@
 
   (def style
     (garden/css
+     [:body {:font-family "helvetica"}]
      [:p {:font-size "16px"}]
      [:a {:margin "5px" :color "purple"}]))
 
