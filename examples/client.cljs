@@ -25,7 +25,11 @@
     (garden/css
      [:body {:font-family "helvetica"}]
      [:p {:font-size "16px"}]
-     [:a {:margin "5px" :color "purple"}]))
+     [:div#content {:margin-left "5px"}]
+     [:a {:margin "5px"
+          :color "purple"
+          :text-decoration "none"}]
+     [:a:hover {:text-decoration "underline"}]))
 
   (defn root []
     [:div
@@ -35,7 +39,8 @@
       [:a {:href "#/page1"} "page 1"]
       [:a {:href "#/nothing-to-see/here"} "broken link"]]
      [:hr]
-     [(:page @state)]])
+     [:div#content
+      [(:page @state)]]])
 
   (defn home []
     [:p "home page"])
