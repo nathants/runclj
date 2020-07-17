@@ -1,8 +1,6 @@
-# runclj. putting the *scripting* back in clojurescript.
-
 ## what
 
-some tooling around single file clojurescript *scripts* running on node or the browser.
+tooling around single file clojurescript *scripts* running on node or the browser.
 
 run a *.cljs file like it was a *.py file.
 
@@ -66,7 +64,9 @@ to force a lein project level rebuild:
 - use an env variable `clean=y runclj shell.cljs`
 - or `rm -rf $(runclj-root shell.cljs)`
 
-you can use a repl as an alternative to just running the script with `runclj`. open `$(runclj-root shell.cljs)/project.clj` in your IDE and start your clojure repl.
+you can use a repl as an alternative to just running the script with `runclj`.
+
+open `$(runclj-root shell.cljs)/project.clj` in your IDE and start your clojure repl.
 
 note: when using `cider` you probably want to use `sesman-link-with-buffer` to associate your source file with the new repl.
 
