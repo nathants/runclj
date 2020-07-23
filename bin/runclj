@@ -39,18 +39,17 @@ browser-mode() {
     cd $root
     cp -f index.html.dev index.html
     if [ "${browser:-}" != n ]; then
+        python3 -m http.server ${port:-8000} &
+        trap "kill $!" EXIT
         if [ -n "${callback:-}" ]; then
-            python3 -m http.server &
-            pid=$!
             (
                 cd $orig
                 set +e
                 bash -c "$callback"
                 echo exited: $?
             )
-            kill $pid
         else
-            python3 -m http.server
+            wait
         fi
     fi
 }
@@ -64,10 +63,10 @@ server-mode() {
     fi
 }
 
-trap 'kill $(jobs -p)' EXIT
 mkdir -p $root
 touch $root/compiler.log
-tail -f $root/compiler.log &
+tail -F $root/compiler.log &
+trap "kill $!" EXIT
 
 if runclj-deps $filepath :browser-mode; then
     browser-mode
