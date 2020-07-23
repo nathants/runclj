@@ -1,7 +1,7 @@
 #!/usr/bin/env runclj
-^{:runclj {:npm [[source-map-support "0.5.6"]]
-           :lein [[org.clojure/clojure "1.10.0"]
-                  [org.clojure/clojurescript "1.10.520"]]}}
+^{:runclj {:npm [[source-map-support "0.5.19"]]
+           :lein [[org.clojure/clojure "1.10.1"]
+                  [org.clojure/clojurescript "1.10.764"]]}}
 (ns main
   (:require [clojure.string :as s]))
 

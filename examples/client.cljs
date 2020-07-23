@@ -1,12 +1,13 @@
 #!/usr/bin/env runclj
 ^{:runclj {:browser-mode true
-           :lein [[org.clojure/clojure "1.10.0"]
-                  [org.clojure/clojurescript "1.10.439"]
-                  [garden "1.3.6"]
+           :lein [[org.clojure/clojure "1.10.1"]
+                  [org.clojure/clojurescript "1.10.764"]
+                  [garden "1.3.10"]
                   [funcool/bide "1.6.0"]
-                  [reagent "0.8.1"]]}}
+                  [reagent "1.0.0-alpha2"]]}}
 (ns client
-  (:require [reagent.core :as reagent]
+  (:require [reagent.dom :as reagent.dom]
+            [reagent.core :as reagent]
             [bide.core :as bide]
             [garden.core :as garden]
             [clojure.browser.repl :as repl]))
@@ -63,7 +64,7 @@
   (defn -main []
     (defonce repl (repl/connect "http://localhost:9000/repl")) ;; localhost for laptop, or an ipv4 address to repl against a mobile browser
     (bide/start! (bide/router router) {:default home :on-navigate #(swap! state assoc :page %) :html5? false})
-    (reagent/render [root] (js/document.getElementById "app")))
+    (reagent.dom/render [root] (js/document.getElementById "app")))
 
   (-main) ;; trigger react re-render for browser repl workflow
 

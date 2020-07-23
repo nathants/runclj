@@ -1,7 +1,8 @@
 #!/usr/bin/env runclj
-^{:runclj {:npm [[express "4.16.3"]]
-           :lein [[org.clojure/clojure "1.10.0"]
-                  [org.clojure/clojurescript "1.10.439"]]}}
+^{:runclj {:npm [[express "4.17.1"]
+                 [source-map-support "0.5.19"]]
+           :lein [[org.clojure/clojure "1.10.1"]
+                  [org.clojure/clojurescript "1.10.764"]]}}
 (ns server)
 
 (def port 8000)
