@@ -33,12 +33,12 @@
      [:a:hover {:text-decoration "underline"}]))
 
   (defn root []
-    [:div
+    [:div#root
      [:style style]
-     [:p
-      [:a {:href "#/"} "home"]
-      [:a {:href "#/page1"} "page 1"]
-      [:a {:href "#/nothing-to-see/here"} "broken link"]]
+     [:p#header
+      [:a#home  {:href "#/"} "home"]
+      [:a#page1 {:href "#/page1"} "page 1"]
+      [:a#404   {:href "#/nothing-to-see/here"} "broken link"]]
      [:hr]
      [:div#content
       [(:page @state)]]])
