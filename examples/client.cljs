@@ -14,9 +14,6 @@
 
 (do
 
-  ;; this (do) block has a (-main) call at the end, for the browser
-  ;; repl workflow. if you aren't using a repl you can drop this.
-
   (defonce state
     (reagent/atom
      {:page home
@@ -62,7 +59,10 @@
      ["(.*)" not-found]])
 
   (defn -main []
-    (defonce repl (repl/connect "http://localhost:9000/repl")) ;; localhost for laptop, or an ipv4 address to repl against a mobile browser
+
+    (when (s/includes? js/window.location.href "localhost")
+      (defonce repl (repl/connect "http://localhost:9000/repl"))) ;; localhost for laptop, or an ipv4 address to repl against a mobile browser
+
     (bide/start! (bide/router router) {:default home :on-navigate #(swap! state assoc :page %) :html5? false})
     (reagent.dom/render [root] (js/document.getElementById "app")))
 
