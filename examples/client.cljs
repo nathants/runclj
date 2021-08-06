@@ -54,7 +54,9 @@
        [component-menu-button "home" "#/"]
        [component-menu-button "page-1" "#/page1"]
        [component-menu-button "broken-link" "#/nothing-to-see/here"]]]
-     [container {:id "content" :style {:padding 0 :margin-top "10px"}}
+     [container {:id "content"
+                 :style {:padding 0
+                         :margin-top "10px"}}
       (when-let [page (:page @state)]
         [page])]])
 
@@ -67,7 +69,8 @@
     [card {:style {:padding "5px"}}
      [typography {:style {:margin "5px"}}
       "this is a page with some data: " (-> @state :page1 :state)]
-     [button {:style {:background-color "rgb(200,200,200)" :margin "5px"}
+     [button {:style {:background-color "rgb(200,200,200)"
+                      :margin "5px"}
               :on-click #(swap! state update-in [:page1 :state] inc)}
       "push me"]])
 
@@ -83,7 +86,9 @@
 
   (defn -main []
     (defonce repl (repl/connect "http://localhost:9000/repl")) ;; localhost for laptop, or an ipv4 address to repl against a mobile browser. this line is automatically removed from the release build.
-    (bide/start! (bide/router router) {:default component-home :on-navigate #(swap! state assoc :page %) :html5? false})
+    (bide/start! (bide/router router) {:default component-home
+                                       :on-navigate #(swap! state assoc :page %)
+                                       :html5? false})
     (reagent.dom/render [component-root] (js/document.getElementById "app")))
 
   ;; trigger re-render for browser repl workflow
