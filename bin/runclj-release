@@ -17,5 +17,5 @@ fi
 cd $root
 echo :recompiling >&2
 lein cljsbuild once release 1>&2
-mv out-release/release.js* .
+cp -f out-release/release.js* .
 echo "$now" > hash
