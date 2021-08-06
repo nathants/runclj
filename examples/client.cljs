@@ -1,16 +1,25 @@
 #!/usr/bin/env runclj
 ^{:runclj {:browser-mode true
-           :lein [[org.clojure/clojure "1.10.1"]
-                  [org.clojure/clojurescript "1.10.764"]
+           :lein [[org.clojure/clojure "1.10.3"]
+                  [org.clojure/clojurescript "1.10.879"]
                   [garden "1.3.10"]
-                  [funcool/bide "1.6.0"]
-                  [reagent "1.0.0-alpha2"]]}}
+                  [funcool/bide "1.7.0"]
+                  [reagent "1.1.0"]
+                  [arttuka/reagent-material-ui "4.11.3-2"]
+                  [cljsjs/react "17.0.2-0"]
+                  [cljsjs/react-dom "17.0.2-0"]]}}
 (ns client
   (:require [reagent.dom :as reagent.dom]
             [reagent.core :as reagent]
             [bide.core :as bide]
             [garden.core :as garden]
-            [clojure.browser.repl :as repl]))
+            [clojure.browser.repl :as repl]
+            [reagent-material-ui.core.button :refer [button]]
+            [reagent-material-ui.core.card :refer [card]]
+            [reagent-material-ui.core.app-bar :refer [app-bar]]
+            [reagent-material-ui.core.toolbar :refer [toolbar]]
+            [reagent-material-ui.core.typography :refer [typography]]
+            [reagent-material-ui.core.container :refer [container]]))
 
 (do
 
@@ -21,51 +30,62 @@
 
   (def style
     (garden/css
-     [:body {:font-family "helvetica"}]
-     [:p {:font-size "16px"}]
-     [:div#content {:margin-left "5px"}]
-     [:a {:margin "5px"
-          :color "purple"
-          :text-decoration "none"}]
-     [:a:hover {:text-decoration "underline"}]))
+     [:body {:background-color "rgb(240, 240, 240)"}]
+     ["*" {:font-family "monospace !important"}]
+     [:.MuiIconButton-root {:border-radius "10%"}]
+     [:.MuiAppBar-colorPrimary {:background-color "rgb(230, 230, 230)"}]))
 
-  (defn root []
-    [:div#root
+  (defn component-menu-button [page-name href]
+    [button {:id page-name
+             :href href
+             :style (if (= page-component (:page @state))
+                      {:color "red"})}
+     page-name])
+
+  (defn component-root []
+    [:<>
      [:style style]
-     [:p#header
-      [:a#home  {:href "#/"} "home"]
-      [:a#page1 {:href "#/page1"} "page 1"]
-      [:a#404   {:href "#/nothing-to-see/here"} "broken link"]]
-     [:hr]
-     [:div#content
+     [app-bar {:position "static"}
+      [toolbar
+       [component-menu-button "home" "#/"]
+       [component-menu-button "page-1" "#/page1"]
+       [component-menu-button "broken-link" "#/nothing-to-see/here"]]]
+     [container {:id "content" :style {:padding 0 :margin-top "10px"}}
       [(:page @state)]]])
 
-  (defn home []
-    [:p "home page"])
+  (defn component-home []
+    [card {:style {:padding "5px"}}
+     [typography {:style {:margin "5px"}}
+      "home page"]])
 
-  (defn page1 []
-    [:div
-     [:p "this is a page with some data: " (-> @state :page1 :state)]
-     [:p [:input {:type "button"
-                  :value "push me"
-                  :on-click #(swap! state update-in [:page1 :state] inc)}]]])
+  (defn component-page1 []
+    [card {:style {:padding "5px"}}
+     [typography {:style {:margin "5px"}}
+      "this is a page with some data: " (-> @state :page1 :state)]
+     [button {:style {:background-color "rgb(200,200,200)"
+                      :margin "5px"}
+              :on-click #(swap! state update-in [:page1 :state] inc)}
+      "push me"]])
 
-  (defn not-found []
-    [:p "404"])
+  (defn component-not-found []
+    [card {:style {:padding "5px"}}
+     [typography {:style {:margin "5px"}}
+      "404"]])
 
   (def router
-    [["/" home]
-     ["/page1" page1]
-     ["(.*)" not-found]])
+    [["/" component-home]
+     ["/page1" component-page1]
+     ["(.*)" component-not-found]])
 
   (defn -main []
 
-    (when (s/includes? js/window.location.href "localhost")
-      (defonce repl (repl/connect "http://localhost:9000/repl"))) ;; localhost for laptop, or an ipv4 address to repl against a mobile browser
+    ;; (defonce repl (repl/connect "http://localhost:9000/repl")) ;; localhost for laptop, or an ipv4 address to repl against a mobile browser
 
-    (bide/start! (bide/router router) {:default home :on-navigate #(swap! state assoc :page %) :html5? false})
-    (reagent.dom/render [root] (js/document.getElementById "app")))
+    (bide/start! (bide/router router) {:default home
+                                       :on-navigate #(swap! state assoc :page %)
+                                       :html5? false})
+    (reagent.dom/render [component-root] (js/document.getElementById "app")))
 
-  (-main) ;; trigger react re-render for browser repl workflow
+  (-main) ;; trigger re-render for browser repl workflow
 
   )
