@@ -15,9 +15,11 @@ build() {
     if [ ! -z "${usecached:-}" ] || [ "$source_hash" == "$compiled_hash" ]; then
         echo :cached >&2
     elif runclj-auto-status $filepath &>/dev/null; then
+        rm -r $root/release.js*
         echo :cljs-auto >&2
         runclj-auto-wait "$filepath"
     else
+        rm -f $root/release.js*
         echo :cljs-once >&2
         runclj-once $filepath
     fi
@@ -55,10 +57,10 @@ browser-mode() {
 }
 
 server-mode() {
+    build
     if ls $root/release.js &>/dev/null; then
         node $root/release.js "$@"
     else
-        build
         node $root/dev.js "$@"
     fi
 }
