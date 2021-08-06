@@ -5,4 +5,8 @@ root=$(runclj-root $filepath)
 src=$root/src
 ns=$(runclj-deps $filepath :ns | tr '-' '_')
 runclj-deps $filepath :macro > $src/$ns.clj
-runclj-deps $filepath :source > $src/$ns.cljs
+if [ "${release:-n}" = "y" ]; then
+    runclj-deps $filepath :source | grep -v '(defonce repl (repl/connect' > $src/$ns.cljs
+else
+    runclj-deps $filepath :source > $src/$ns.cljs
+fi

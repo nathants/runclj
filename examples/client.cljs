@@ -8,8 +8,10 @@
                   [arttuka/reagent-material-ui "4.11.3-2"]
                   [cljsjs/react "17.0.2-0"]
                   [cljsjs/react-dom "17.0.2-0"]]}}
+
 (ns client
-  (:require [reagent.dom :as reagent.dom]
+  (:require [cljs.pprint :as pp]
+            [reagent.dom :as reagent.dom]
             [reagent.core :as reagent]
             [bide.core :as bide]
             [garden.core :as garden]
@@ -21,11 +23,16 @@
             [reagent-material-ui.core.typography :refer [typography]]
             [reagent-material-ui.core.container :refer [container]]))
 
+
+;; a global do block makes the browser repl workflow more convenient
+;; by invoking (-main) no matter which form was evaluated.
 (do
+
+  (set! *warn-on-infer* true)
 
   (defonce state
     (reagent/atom
-     {:page home
+     {:page nil
       :page1 {:state 0}}))
 
   (def style
@@ -36,10 +43,7 @@
      [:.MuiAppBar-colorPrimary {:background-color "rgb(230, 230, 230)"}]))
 
   (defn component-menu-button [page-name href]
-    [button {:id page-name
-             :href href
-             :style (if (= page-component (:page @state))
-                      {:color "red"})}
+    [button {:href href}
      page-name])
 
   (defn component-root []
@@ -51,7 +55,8 @@
        [component-menu-button "page-1" "#/page1"]
        [component-menu-button "broken-link" "#/nothing-to-see/here"]]]
      [container {:id "content" :style {:padding 0 :margin-top "10px"}}
-      [(:page @state)]]])
+      (when-let [page (:page @state)]
+        [page])]])
 
   (defn component-home []
     [card {:style {:padding "5px"}}
@@ -62,8 +67,7 @@
     [card {:style {:padding "5px"}}
      [typography {:style {:margin "5px"}}
       "this is a page with some data: " (-> @state :page1 :state)]
-     [button {:style {:background-color "rgb(200,200,200)"
-                      :margin "5px"}
+     [button {:style {:background-color "rgb(200,200,200)" :margin "5px"}
               :on-click #(swap! state update-in [:page1 :state] inc)}
       "push me"]])
 
@@ -78,14 +82,9 @@
      ["(.*)" component-not-found]])
 
   (defn -main []
-
-    ;; (defonce repl (repl/connect "http://localhost:9000/repl")) ;; localhost for laptop, or an ipv4 address to repl against a mobile browser
-
-    (bide/start! (bide/router router) {:default home
-                                       :on-navigate #(swap! state assoc :page %)
-                                       :html5? false})
+    (defonce repl (repl/connect "http://localhost:9000/repl")) ;; localhost for laptop, or an ipv4 address to repl against a mobile browser. this line is automatically removed from the release build.
+    (bide/start! (bide/router router) {:default component-home :on-navigate #(swap! state assoc :page %) :html5? false})
     (reagent.dom/render [component-root] (js/document.getElementById "app")))
 
-  (-main) ;; trigger re-render for browser repl workflow
-
-  )
+  ;; trigger re-render for browser repl workflow
+  (-main))
