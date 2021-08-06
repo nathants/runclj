@@ -19,6 +19,12 @@ EOF
 
 browser-project() {
 npm=$(runclj-deps $filepath :npm 2>/dev/null | tr -d '[]')
+if [ -n "$npm" ]; then
+npm="
+    :npm-deps {$npm}
+    :install-deps true
+"
+fi
 cat <<EOF
 (defproject $(basename $filepath) "0.0.1"
   :dependencies [[cider/piggieback "$piggieback"]
@@ -33,8 +39,8 @@ cat <<EOF
                                    :output-dir "out"
                                    :source-map true
                                    :optimizations :none
+                                   $npm
                                    :parallel-build true
-                                   :npm-deps {$npm}
                                    :pretty-print true}}
                        {:id "release"
                         :source-paths ["src"]
@@ -42,7 +48,7 @@ cat <<EOF
                                    :source-map "out-release/release.js.map"
                                    :output-dir "out-release"
                                    :parallel-build true
-                                   :npm-deps {$npm}
+                                   $npm
                                    :optimizations :advanced}}]})
 EOF
 }
