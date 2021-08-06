@@ -2,13 +2,15 @@
 
 ## what
 
-tooling around single file clojurescript *scripts* running on node or the browser.
-
-run a *.cljs file like it was a *.py file.
+tooling around single file clojurescript programs running on node or the browser.
 
 ``` bash
 runclj ./rotate_the_logs.cljs
 ```
+
+## how
+
+transparently converts a single clojurescript file into a temporary leiningen project in `.lein/`.
 
 ## installation
 
@@ -22,27 +24,21 @@ get the dependencies:
 then:
 ```bash
 git clone https://github.com/nathants/runclj
-mv runclj/bin/* runclj/bin/.lein /usr/local/bin
+sudo mv runclj/bin/* runclj/bin/.lein /usr/local/bin
 ```
 
 ## examples
 
-- [hello.cljs](https://github.com/nathants/runclj/blob/master/examples/hello.cljs)
-- [shell.cljs](https://github.com/nathants/runclj/blob/master/examples/shell.cljs)
-- [server.cljs](https://github.com/nathants/runclj/blob/master/examples/server.cljs)
-- [client.cljs](https://github.com/nathants/runclj/blob/master/examples/client.cljs) deployed: [live](https://nathants.com/client.cljs/)
-- [macros.cljs](https://github.com/nathants/runclj/blob/master/examples/macros.cljs)
+- [hello.cljs](https://github.com/nathants/runclj/blob/master/examples/hello.cljs) - node hello world
+- [shell.cljs](https://github.com/nathants/runclj/blob/master/examples/shell.cljs) - node with subprocess, user prompts, and core.async
+- [server.cljs](https://github.com/nathants/runclj/blob/master/examples/server.cljs) - node express server
+- [client.cljs](https://github.com/nathants/runclj/blob/master/examples/client.cljs) - client app with material ui ([demo](https://nathants.com/client.cljs/))
+- [macros.cljs](https://github.com/nathants/runclj/blob/master/examples/macros.cljs) - node hello world with macros
 
 ## usage
 
 ``` bash
-runclj shell.cljs
-```
-
-if it has already been compiled, it can also be run as:
-
-``` bash
-node $(runclj-root shell.cljs)/dev.js # this resolves to: .lein/shell.cljs/dev.js
+runclj program.cljs
 ```
 
 declare clojure and npm dependencies with meta-data at the start of the file.
@@ -55,72 +51,82 @@ declare clojure and npm dependencies with meta-data at the start of the file.
   (:require [schema.core :as schema :include-macros true]))
 ```
 
-`runclj` is converting a single clojurescript file into a temporary leiningen project in `.lein/`
+run the program.
 
-`runclj` will recompile if the source has changed. start the auto compiler for faster iteration.
+`runclj program.cljs`
 
-in terminal 1: `runclj-auto-start shell.cljs`
+## repl workflow
 
-in terminal 2: `runclj shell.cljs`
+- open `.lein/program.cljs/project.clj` in an IDE and start a clojure repl.
 
-to force a lein project level rebuild:
+- call the function `(start-node-repl)` or `(start-browser-repl)` to begin the repl session.
 
-- use an env variable `clean=y runclj shell.cljs`
-- or `rm -rf $(runclj-root shell.cljs)`
+- when using [cider](https://docs.cider.mx/) use `M-x sesman-link-with-buffer` to associate the source file with the new repl.
 
-to use a repl as an alternative to just running the script with `runclj`.
+- for other IDEs like [vim](https://github.com/tpope/vim-fireplace), [vscode](https://marketplace.visualstudio.com/items?itemName=betterthantomorrow.calva) or [intellij](https://cursive-ide.com/), associate the source file with the repl session in the recommended way.
 
-open `$(runclj-root shell.cljs)/project.clj` in an IDE and start the clojure repl.
-
-note: when using `cider` use `sesman-link-with-buffer` to associate the source file with the new repl.
-
-then call the function `(start-node-repl)`, or for client code `(start-browser-repl)` which launches a new browser window in the default browser.
-
-## repl free workflow for client code
+## auto-reloading workflow
 
 an alternative workflow using [entr](http://www.entrproject.org/) instead of a repl:
 
-in terminal 1: `runclj-auto-start $path`
+- in terminal 1: `runclj-auto-start program.cljs`
 
-in terminal 2: `ls shell.cljs | entr -r runclj $path`
+- in terminal 2: `ls program.cljs | entr -r runclj program.cljs`
 
-to run a test suite after every compile:
+## auto-testing workflow
 
-`ls shell.cljs | callback="bash ./test.sh" entr -r runclj $path`
+`ls program.cljs | callback="bash ./test.sh" entr -r runclj program.cljs`
 
-`entr` watches for changes in the source file and recompiles.
+## client deployment
 
-## deployment
-
-do a release with advanced compilation
+ship a release with advanced compilation.
 
 ```bash
-runclj-release shell.cljs
+runclj-release program.cljs
+scp index.html     user@remote:/var/www/html
+scp release.js     user@remote:/var/www/html
+scp release.js.map user@remote:/var/www/html
 ```
 
-or ship a release as a tarball which include all node_modules
+## server deployment
+
+ship a release as a tarball including node_modules.
 
 ```bash
-runclj-tar shell.cljs > shell.tgz
-scp shell.tgz user@remote:
-ssh user@remote tar xf shell.tgz
+runclj-tar program.cljs > release.tgz
+scp release.tgz user@remote:
+ssh user@remote tar xf release.tgz
 ```
 
 run with node
 
 ```bash
-ssh user@remote node .lein/shell.cljs/release.js
+ssh user@remote node .lein/program.cljs/release.js
 ```
 
 or runclj
 
 ```bash
-ssh user@remote runclj shell.cljs
+ssh user@remote runclj program.cljs
 ```
 
-for client code, start a web server to serve `index.html` and `release.js`
+## outgrowing runclj
 
-```bash
-cd .lein/client.cljs
-python3 -m http.server
-```
+if your project grows too large for a single file, copy the generated leiningen project and continue working on that directly.
+
+- `runclj program.cljs`
+
+- `cp -r .lein/program.cljs program`
+
+- `tree program`
+
+  ```
+  program
+  ├── project.clj
+  └── src
+      ├── program.clj
+      ├── program.cljs
+      ├── runner.cljs
+      └── repl.clj
+
+  ```
