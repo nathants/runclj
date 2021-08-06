@@ -12,8 +12,8 @@ process.chdir(__dirname)
 try { require('source-map-support').install(); } catch(e) {};
 require("$root/out/goog/bootstrap/nodejs");
 require("$root/out/dev.js");
-require("$root/out/cljs_runner.js");
-global.cljs_runner.run();
+require("$root/out/runner.js");
+global.runner.run();
 EOF
 }
 
@@ -153,7 +153,7 @@ cat <<EOF
         <div id="app"></div>
         <script src="out/goog/base.js" type="text/javascript" charset="utf-8"></script>
         <script src="out/dev.js" type="text/javascript" charset="utf-8"></script>
-        <script type="text/javascript">goog.require("cljs_runner")</script>
+        <script type="text/javascript">goog.require("runner")</script>
     </body>
 </html>
 EOF
@@ -162,7 +162,7 @@ EOF
 browser-runner() {
 ns=$(runclj-deps $filepath :ns)
 cat <<EOF
-(ns cljs-runner
+(ns runner
   (:require [$ns :as $ns]))
 ($ns/-main)
 EOF
@@ -171,7 +171,7 @@ EOF
 server-runner(){
 ns=$(runclj-deps $filepath :ns)
 cat <<EOF
-(ns cljs-runner
+(ns runner
   (:require [$ns :as $ns]
             [cljs.nodejs :as nodejs]))
 (nodejs/enable-util-print!)
@@ -190,11 +190,11 @@ if runclj-deps $filepath :browser-mode; then
     manifest > $root/main.manifest
     index-dev > $root/index.html.dev
     index-release > $root/index.html.release
-    browser-runner > $root/src/cljs_runner.cljs
+    browser-runner > $root/src/runner.cljs
     browser-project > $root/project.clj
 else
     dev > $root/dev.js
-    server-runner > $root/src/cljs_runner.cljs
+    server-runner > $root/src/runner.cljs
     server-project > $root/project.clj
 fi
 
