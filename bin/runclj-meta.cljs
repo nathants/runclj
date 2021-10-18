@@ -2,7 +2,7 @@
 ^{:runclj {:lein [[org.clojure/clojure "1.10.0"]
                   [org.clojure/clojurescript "1.10.439"]
                   [org.clojure/tools.reader "1.3.2"]]}}
-(ns runclj-deps
+(ns runclj-meta
   (:require [clojure.string :as s]
             [cljs.tools.reader :as r :refer [*data-readers* *default-data-reader-fn* read-string *alias-map* resolve-symbol]]
             [cljs.tools.reader.impl.utils :refer [reader-conditional reader-conditional?]]
@@ -23,9 +23,9 @@
           lines (if (s/starts-with? (first lines) "#!") (rest lines) lines)
           text (s/join "\n" lines)
           reader (rt/source-logging-push-back-reader text)
-          forms (->> #(r/read {:eof :runclj-deps-stop} reader)
+          forms (->> #(r/read {:eof :runclj-meta-stop} reader)
                   repeatedly
-                  (take-while #(not= % :runclj-deps-stop)))
+                  (take-while #(not= % :runclj-meta-stop)))
           runclj (->> forms
                    (filter #(= 'ns (first %)))
                    first

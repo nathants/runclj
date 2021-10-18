@@ -5,9 +5,9 @@ root=$(runclj-root $filepath)
 echo :recompiling >&2
 
 src=$(runclj-root $filepath)/src
-ns=$(runclj-deps $filepath :ns | tr '-' '_')
-runclj-deps $filepath :macro > $root/$ns.clj.tmp
-runclj-deps $filepath :source > $root/$ns.cljs.tmp
+ns=$(runclj-meta $filepath :ns | tr '-' '_')
+runclj-meta $filepath :macro > $root/$ns.clj.tmp
+runclj-meta $filepath :source > $root/$ns.cljs.tmp
 
 if [ "$(cat $root/$ns.clj.tmp | shasum)" != "$(cat $src/$ns.clj | shasum)" ]; then
     echo :clj-source >&2

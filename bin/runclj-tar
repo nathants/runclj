@@ -14,7 +14,7 @@ paths_that_exist() {
 }
 tar czf - $(paths_that_exist \
                 $name \
-                $(runclj-deps $filepath :static | while read path; do echo $root/$(basename $path); done) \
+                $(runclj-meta $filepath :static | while read path; do echo $root/$(basename $path); done) \
                 $root/release.js \
                 $root/package.json \
                 $root/package-lock.json \
