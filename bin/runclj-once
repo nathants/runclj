@@ -3,6 +3,7 @@ set -euo pipefail
 filepath=$1
 root=$(runclj-root $filepath)
 now=$(runclj-hash $filepath)
+ns=$(runclj-meta $filepath :ns | tr '-' '_')
 echo :recompiling >&2
 runclj-make-proj $filepath
 runclj-update $filepath
@@ -11,4 +12,5 @@ if runclj-meta $filepath :browser-mode; then
 fi
 cd $root
 lein cljsbuild once dev
+cp -f src/$ns.cljs $ns.cljs
 echo "$now" > hash
