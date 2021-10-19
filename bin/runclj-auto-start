@@ -7,6 +7,7 @@ runclj-update $filepath
 cd $(runclj-root $filepath)
 echo :cljsbuild :auto >&2
 echo $$ > runclj-auto.pid
+cp -f index.html.dev index.html
 lein trampoline cljsbuild auto dev 2>&1 \
     | tee >(grep --line-buffered "Successfully compiled" > compiled.log) \
     | tee >(cat - > compiler.log)

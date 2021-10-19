@@ -6,6 +6,9 @@ now=$(runclj-hash $filepath)
 echo :recompiling >&2
 runclj-make-proj $filepath
 runclj-update $filepath
+if runclj-meta $filepath :browser-mode; then
+    cp -f $root/index.html.dev $root/index.html
+fi
 cd $root
 lein cljsbuild once dev
 echo "$now" > hash

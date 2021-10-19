@@ -39,7 +39,6 @@ browser-mode() {
     done
     orig=$(pwd)
     cd $root
-    cp -f index.html.dev index.html
     if [ "${browser:-}" != n ]; then
         runclj-serve ${port:-8000} &
         trap "kill $!" EXIT
