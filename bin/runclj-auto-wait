@@ -3,19 +3,20 @@ set -euo pipefail
 filepath=$1
 root=$(runclj-root $filepath)
 echo :recompiling >&2
-
 src=$(runclj-root $filepath)/src
 ns=$(runclj-meta $filepath :ns | tr '-' '_')
 runclj-meta $filepath :macro > $root/$ns.clj.tmp
 runclj-meta $filepath :source > $root/$ns.cljs.tmp
 
-if [ "$(cat $root/$ns.clj.tmp | shasum)" != "$(cat $src/$ns.clj | shasum)" ]; then
+if [ "$(cat $root/$ns.clj.tmp | python3 -c 'import sys, hashlib; print(hashlib.sha1(sys.stdin.buffer.read()).hexdigest())')" \
+     != "$(cat $src/$ns.clj | python3 -c 'import sys, hashlib; print(hashlib.sha1(sys.stdin.buffer.read()).hexdigest())')" ]; then
     echo :clj-source >&2
     mv -f $root/$ns.clj.tmp $src/$ns.clj
     now=$(cat $root/compiled.log|wc -l)
     while true; do [ "$now" != "$(cat $root/compiled.log|wc -l)" ] && break; sleep .01; done
 
-elif [ "$(cat $root/$ns.cljs.tmp | shasum)" != "$(cat $src/$ns.cljs | shasum)" ]; then
+elif [ "$(cat $root/$ns.cljs.tmp | python3 -c 'import sys, hashlib; print(hashlib.sha1(sys.stdin.buffer.read()).hexdigest())')" \
+       != "$(cat $src/$ns.cljs | python3 -c 'import sys, hashlib; print(hashlib.sha1(sys.stdin.buffer.read()).hexdigest())')" ]; then
     echo :cljs-source >&2
     now=$(cat $root/compiled.log|wc -l)
     mv -f $root/$ns.cljs.tmp $src/$ns.cljs
