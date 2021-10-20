@@ -114,22 +114,9 @@ cat <<EOF
 EOF
 }
 
-manifest() {
-cat <<EOF
-CACHE MANIFEST
-# $(cat /proc/sys/kernel/random/uuid)
-
-CACHE:
-*
-
-NETWORK:
-*
-EOF
-}
-
 index-release() {
 cat <<EOF
-<html manifest="./main.manifest">
+<html>
     <head>
       <meta charset="utf-8">
       <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'/>
@@ -187,7 +174,6 @@ mkdir -p $root/src
 repl > $root/src/repl.clj
 
 if runclj-meta $filepath :browser-mode; then
-    manifest > $root/main.manifest
     index-dev > $root/index.html.dev
     index-release > $root/index.html.release
     browser-runner > $root/src/runner.cljs
