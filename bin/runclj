@@ -40,7 +40,7 @@ browser-mode() {
     orig=$(pwd)
     cd $root
     if [ "${browser:-}" != n ]; then
-        runclj-serve ${port:-8000} &
+        runclj-serve &
         trap "kill $!" EXIT
         if [ -n "${callback:-}" ]; then
             (
