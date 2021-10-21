@@ -4,6 +4,7 @@ RUN apk update && apk upgrade -a
 
 RUN apk add \
     bash \
+    coreutils \
     curl \
     git \
     npm \
