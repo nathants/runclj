@@ -7,6 +7,7 @@ RUN apk add \
     coreutils \
     curl \
     git \
+    grep \
     npm \
     openjdk11 \
     procps \
