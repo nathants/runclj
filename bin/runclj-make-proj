@@ -2,119 +2,57 @@
 set -euo pipefail
 filepath=$1
 root=$(runclj-root $filepath)
-piggieback=0.5.2
-cljsbuild=1.1.8
 
-dev(){
+package-json() {
+npm=$(runclj-meta $filepath :npm 2>/dev/null | python3 -c 'import sys, json; print(json.dumps(dict([x[1:-1].replace("\"", "").split(None, 1) for x in sys.stdin.read().splitlines()])))')
+ns=$(runclj-meta $filepath :ns)
 cat <<EOF
-#!/usr/bin/env node
-process.chdir(__dirname)
-try { require('source-map-support').install(); } catch(e) {};
-require("$root/out/goog/bootstrap/nodejs");
-require("$root/out/dev.js");
-require("$root/out/runner.js");
-global.runner.run();
+{
+  "name": "${ns}",
+  "version": "0.0.1",
+  "private": true,
+  "devDependencies": {
+    "shadow-cljs": "2.16.0"
+  },
+  "dependencies": ${npm}
+}
 EOF
 }
 
 browser-project() {
-npm=$(runclj-meta $filepath :npm 2>/dev/null | tr -d '[]')
-if [ -n "$npm" ]; then
-npm="
-    :npm-deps {$npm}
-    :install-deps true
-"
-fi
+ns=$(runclj-meta $filepath :ns)
+deps=$(runclj-meta $filepath :deps 2>/dev/null)
 cat <<EOF
-(defproject $(basename $filepath) "0.0.1"
-  :dependencies [[cider/piggieback "$piggieback"]
-                 $(runclj-meta $filepath :lein 2>/dev/null)
-                ]
-  :plugins [[lein-cljsbuild "$cljsbuild"]]
-  :main repl
-  :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
-  :cljsbuild {:builds [{:id "dev"
-                        :source-paths ["src"]
-                        :compiler {:output-to "out/dev.js"
-                                   :output-dir "out"
-                                   :source-map true
-                                   :optimizations :none
-                                   $npm
-                                   :parallel-build true
-                                   :pretty-print true}}
-                       {:id "release"
-                        :source-paths ["src"]
-                        :compiler {:output-to "out-release/release.js"
-                                   :source-map "out-release/release.js.map"
-                                   :output-dir "out-release"
-                                   :parallel-build true
-                                   $npm
-                                   :optimizations :advanced}}]})
+{:source-paths ["src/main"]
+ :dependencies [$deps]
+ :nrepl {:port 3333}
+ :dev-http {8000 "public"}
+ :builds {:app {:target :browser
+                :output-dir "public"
+                :js-options {:js-provider :shadow}
+                :compiler-options {:optimizations :simple}
+                :modules {:core {:init-fn ${ns}/main}}}}}
 EOF
 }
 
 server-project() {
-npm=$(runclj-meta $filepath :npm 2>/dev/null | tr -d '[]')
 ns=$(runclj-meta $filepath :ns)
+deps=$(runclj-meta $filepath :deps 2>/dev/null)
 cat <<EOF
-(defproject $(basename $filepath) "0.0.1"
-  :dependencies [[cider/piggieback "$piggieback"] $(runclj-meta $filepath :lein 2>/dev/null)]
-  :plugins [[lein-cljsbuild "$cljsbuild"]]
-  :main repl
-  :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
-  :cljsbuild {:builds [{:id "dev"
-                        :source-paths ["src"]
-                        :compiler {:output-to "out/dev.js"
-                                   :output-dir "out"
-                                   :source-map true
-                                   :optimizations :none
-                                   :main "$ns"
-                                   :pretty-print true
-                                   :npm-deps {$npm}
-                                   :install-deps true
-                                   :target :nodejs}}
-                       {:id "release"
-                        :source-paths ["src"]
-                        :compiler {:output-to "out-release/release.js"
-                                   :source-map "out-release/release.js.map"
-                                   :output-dir "out-release"
-                                   :optimizations :simple
-                                   :npm-deps {$npm}
-                                   :install-deps true
-                                   :target :nodejs}}]})
+{:source-paths ["src/main"]
+ :dependencies [$deps]
+ :nrepl {:port 3333}
+ :builds {:app {:target :node-script
+                :output-to "public/core.js"
+                :output-dir "public"
+                :js-options {:js-provider :shadow}
+                :compiler-options {:optimizations :simple}
+                :main ${ns}/main
+}}}
 EOF
 }
 
-repl() {
-npm=$(runclj-meta $filepath :npm 2>/dev/null | tr -d '[]')
-cat <<EOF
-(ns repl
-  (:require [cider.piggieback :refer [cljs-repl]]
-            [cljs.repl.node :as node]
-            [cljs.repl.browser :as browser]))
-(defn start-node-repl
-  []
-  (cljs-repl (node/repl-env)
-             :analyze-path "src"
-             :output-dir "out-repl"
-             :optimizations :none
-             :pretty-print true
-             :npm-deps '{$npm}
-             :install-deps true
-             :target :nodejs
-             :source-map true))
-(defn start-browser-repl
-  []
-  (cljs-repl (browser/repl-env)
-             :analyze-path "src"
-             :output-dir "out-repl"
-             :optimizations :none
-             :pretty-print true
-             :source-map true))
-EOF
-}
-
-index-release() {
+index() {
 cat <<EOF
 <html>
     <head>
@@ -123,65 +61,19 @@ cat <<EOF
     </head>
     <body>
         <div id="app"></div>
-        <script src="release.js" type="text/javascript" charset="utf-8"></script>
+        <script src="core.js" type="text/javascript" charset="utf-8"></script>
     </body>
 </html>
 EOF
 }
 
-index-dev() {
-cat <<EOF
-<html>
-    <head>
-      <meta charset="utf-8">
-      <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'/>
-    </head>
-    <body>
-        <div id="app"></div>
-        <script src="out/goog/base.js" type="text/javascript" charset="utf-8"></script>
-        <script src="out/dev.js" type="text/javascript" charset="utf-8"></script>
-        <script type="text/javascript">goog.require("runner")</script>
-    </body>
-</html>
-EOF
-}
+mkdir -p $root/src/main
+mkdir -p $root/public
 
-browser-runner() {
-ns=$(runclj-meta $filepath :ns)
-cat <<EOF
-(ns runner
-  (:require [$ns :as $ns]))
-($ns/-main)
-EOF
-}
-
-server-runner(){
-ns=$(runclj-meta $filepath :ns)
-cat <<EOF
-(ns runner
-  (:require [$ns :as $ns]
-            [cljs.nodejs :as nodejs]))
-(nodejs/enable-util-print!)
-(defn run [& _]
-  (process.chdir "$(dirname $(realpath $filepath))")
-  (apply $ns/-main (drop 2 (.-argv js/process))))
-(set! *main-cli-fn* run)
-EOF
-}
-
-mkdir -p $root/src
-
-repl > $root/src/repl.clj
-
+package-json > $root/package.json
 if runclj-meta $filepath :browser-mode; then
-    index-dev > $root/index.html.dev
-    index-release > $root/index.html.release
-    browser-runner > $root/src/runner.cljs
-    browser-project > $root/project.clj
+    index > $root/public/index.html
+    browser-project > $root/shadow-cljs.edn
 else
-    dev > $root/dev.js
-    server-runner > $root/src/runner.cljs
-    server-project > $root/project.clj
+    server-project > $root/shadow-cljs.edn
 fi
-
-rm -f $root/package*.json

@@ -1,7 +1,6 @@
 #!/usr/bin/env runclj
-^{:runclj {:lein [[org.clojure/clojure "1.10.0"]
-                  [org.clojure/clojurescript "1.10.439"]
-                  [org.clojure/tools.reader "1.3.2"]]}}
+^{:runclj {:deps [[org.clojure/tools.reader "1.3.6"]]}}
+
 (ns runclj-meta
   (:require [clojure.string :as s]
             [cljs.tools.reader :as r :refer [*data-readers* *default-data-reader-fn* read-string *alias-map* resolve-symbol]]
@@ -13,7 +12,7 @@
   [path]
   (.readFileSync (js/require "fs") path "utf-8"))
 
-(defn -main
+(defn main
   [filepath key]
   (binding [*default-data-reader-fn* (fn [a b] b)
             resolve-symbol identity]
@@ -36,7 +35,7 @@
         (= :static key)
         (->> runclj key (map println) dorun)
 
-        (#{:npm :lein} key)
+        (#{:npm :deps} key)
         (->> runclj key (map pr) dorun)
 
         (= "mode" (second (s/split (name key) "-")))

@@ -10,7 +10,7 @@ runclj ./rotate_the_logs.cljs
 
 ## how
 
-transparently converts a single clojurescript file into a temporary leiningen project in `.lein/`.
+transparently converts a single clojurescript file into a temporary shadow-cljs project in `.shadow-cljs/`.
 
 ## installation
 
@@ -18,13 +18,13 @@ get the dependencies:
 - bash
 - python3
 - java
-- leiningen
 - node
+- npm
 
 then:
 ```bash
 git clone https://github.com/nathants/runclj
-sudo mv runclj/bin/* runclj/bin/.lein /usr/local/bin
+sudo mv runclj/bin/* runclj/bin/.shadow-cljs /usr/local/bin
 ```
 
 ## examples
@@ -46,7 +46,7 @@ declare clojure and npm dependencies with meta-data at the start of the file.
 ``` clojure
 #!/usr/bin/env runclj
 ^{:runclj {:npm [[express "4.16.3"]]
-           :lein [[prismatic/schema "1.1.3"]]}}
+           :deps [[prismatic/schema "1.1.3"]]}}
 (ns main
   (:require [schema.core :as schema :include-macros true]))
 ```
@@ -55,78 +55,54 @@ run the program.
 
 `runclj program.cljs`
 
-## repl workflow
+## browser dev workflow
 
-- open `.lein/program.cljs/project.clj` in an IDE and start a clojure repl.
+- `runclj-watch examples/client.cljs`
 
-- call the function `(start-node-repl)` or `(start-browser-repl)` to begin the repl session.
+- open browser to `localhost:8000`
 
-- when using [cider](https://docs.cider.mx/) use `M-x sesman-link-with-buffer` to associate the source file with the new repl.
+- edit `client.cljs` and browser auto reloads
 
-- for other IDEs like [vim](https://github.com/tpope/vim-fireplace), [vscode](https://marketplace.visualstudio.com/items?itemName=betterthantomorrow.calva) or [intellij](https://cursive-ide.com/), associate the source file with the repl session in the recommended way.
+- optionally connect to repl on `localhost:3333`
 
-## auto-reloading workflow
+## server dev workflow
 
-an alternative workflow using [entr](http://www.entrproject.org/) instead of a repl:
+`runclj examples/server.cljs`
 
-- in terminal 1: `runclj-auto-start program.cljs`
-
-- in terminal 2: `ls program.cljs | entr -r runclj program.cljs`
-
-## auto-testing workflow
-
-`ls program.cljs | callback="bash ./test.sh" entr -r runclj program.cljs`
-
-## client deployment
-
-ship a release with advanced compilation.
+## deployment
 
 ```bash
-runclj-release program.cljs
-scp index.html     user@remote:/var/www/html
-scp release.js     user@remote:/var/www/html
-scp release.js.map user@remote:/var/www/html
+runclj-tar program.cljs | ssh server tar xf -
 ```
 
-## server deployment
+then either install `runclj` and run normally `runclj program.cljs`
 
-ship a release as a tarball including node_modules.
+or run manually:
 
-```bash
-runclj-tar program.cljs > release.tgz
-scp release.tgz user@remote:
-ssh user@remote tar xf release.tgz
-```
+- browser: `cd .shadow-cljs/program.cljs/public && python3 -m http.server`
 
-run with node
-
-```bash
-ssh user@remote node .lein/program.cljs/release.js
-```
-
-or runclj
-
-```bash
-ssh user@remote runclj program.cljs
-```
+- server: `cd .shadow-cljs/program.cljs/ && node public/core.js`
 
 ## outgrowing runclj
 
-if your project grows too large for a single file, copy the generated leiningen project and continue working on that directly.
+if your project grows too large for a single file, copy the generated shadow-cljs project and continue working on that directly.
 
 - `runclj program.cljs`
 
-- `cp -r .lein/program.cljs program`
+- `cp -r .shadow-cljs/program.cljs program`
 
 - `tree program`
 
   ```
-  program
-  ├── project.clj
-  └── src
-      ├── program.clj
-      ├── program.cljs
-      ├── runner.cljs
-      └── repl.clj
+>> tree
 
+├── package.json
+├── package-lock.json
+├── public
+│   ├── core.js
+│   ├── index.html
+├── shadow-cljs.edn
+└── src
+    └── main
+        └── client.cljs
   ```

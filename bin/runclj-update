@@ -1,12 +1,17 @@
 #!/bin/bash
 set -euo pipefail
+
 filepath=$1
 root=$(runclj-root $filepath)
 src=$root/src
 ns=$(runclj-meta $filepath :ns | tr '-' '_')
-runclj-meta $filepath :macro > $src/$ns.clj
-if [ "${release:-n}" = "y" ]; then
-    runclj-meta $filepath :source | grep -v '(defonce repl (repl/connect' > $src/$ns.cljs
-else
-    runclj-meta $filepath :source > $src/$ns.cljs
-fi
+runclj-meta $filepath :macro > $src/main/$ns.clj
+runclj-meta $filepath :source > $src/main/$ns.cljs
+if [ ! -d $root/node_modules/shadow-cljs ]; then (
+    cd $root
+    npm i --save-dev shadow-cljs
+) fi
+if [ ! -d $root/node_modules/http-server ]; then (
+    cd $root
+    npm i --save-dev http-server
+) fi

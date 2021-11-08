@@ -1,2 +1,3 @@
-examples/.lein
+examples/.shadow-cljs
 *.output
+*.tar

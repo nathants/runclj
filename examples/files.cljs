@@ -1,7 +1,6 @@
 #!/usr/bin/env runclj
-^{:runclj {:npm [[source-map-support "0.5.19"]]
-           :lein [[org.clojure/clojure "1.10.1"]
-                  [org.clojure/clojurescript "1.10.764"]]}}
+^{:runclj {:npm []
+           :deps []}}
 (ns main
   (:require [clojure.string :as s]))
 
@@ -19,7 +18,7 @@
 (defn dumps [x]
   (js/JSON.stringify (clj->js x)))
 
-(defn -main
+(defn main
   [& args]
   (let [in-path "files.json"
         out-path (str in-path ".output")]

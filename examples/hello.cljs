@@ -1,9 +1,10 @@
 #!/usr/bin/env runclj
-^{:runclj {:npm [[source-map-support "0.5.19"]]
-           :lein [[org.clojure/clojure "1.10.1"]
-                  [org.clojure/clojurescript "1.10.764"]]}}
+^{:runclj {:npm []
+           :deps []}}
+
 (ns hello)
 
-(defn -main
+(defn main
   [& args]
+  (throw "asdf")
   (println :hello :world args))

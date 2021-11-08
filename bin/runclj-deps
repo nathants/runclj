@@ -4,4 +4,4 @@ filepath=$1
 runclj-make-proj $filepath
 runclj-update $filepath
 cd $(runclj-root $filepath)
-lein deps
+npx shadow-cljs npm-deps :app

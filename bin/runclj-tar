@@ -4,7 +4,7 @@ filepath=$1
 runclj-release $filepath >&2
 name=$(basename $filepath)
 cd $(runclj-root $filepath)/../..
-root=.lein/$name
+root=.shadow-cljs/$name
 paths_that_exist() {
     for path in "$@"; do
         if ls $path &>/dev/null; then
@@ -12,11 +12,15 @@ paths_that_exist() {
         fi
     done
 }
-tar czf - $(paths_that_exist \
+rm -rf $root/node_modules
+if ! runclj-meta $filepath :browser-mode; then (
+    cd $root
+    npm ci >&2
+) fi
+tar cf - $(paths_that_exist \
                 $name \
-                $(runclj-meta $filepath :static | while read path; do echo $root/$(basename $path); done) \
-                $root/release.js \
-                $root/package.json \
-                $root/package-lock.json \
+                $(runclj-meta $filepath :static | while read path; do echo $root/public/$(basename $path); done) \
+                $root/hash \
                 $root/node_modules \
-                $root/index.html)
+                $root/public/*.html \
+                $root/public/*.js)

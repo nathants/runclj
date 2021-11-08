@@ -13,12 +13,3 @@ RUN apk add \
     procps \
     python3 \
     which
-
-RUN curl https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein > /usr/local/bin/lein && \
-    chmod +x /usr/local/bin/lein && \
-    lein upgrade
-
-RUN git clone https://github.com/nathants/runclj && \
-    cd runclj && \
-    mv bin/* bin/.lein /usr/local/bin && \
-    npm install -g http-server

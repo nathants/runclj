@@ -1,0 +1,33 @@
+#!/bin/bash
+set -euo pipefail
+filepath=$1
+root=$(runclj-root $filepath)
+runclj-make-proj $filepath
+
+kill $(cat $root/update.pid &>/dev/null) &>/dev/null || true
+
+# using entr, call `runclj-update $filepath` whenever $filepath is updated
+if which entr &>/dev/null; then
+    ls $filepath | entr -r runclj-update $filepath &>/dev/null &
+    pid=$!
+
+# using stat in a loop, call `runclj-update $filepath` whenever $filepath is updated
+else
+    last=""
+    echo install entr for faster reloads: https://eradman.com/entrproject/ &>2
+    while true; do
+        now="$(stat $filepath)"
+        if [ "$now" != "$last" ]; then
+            runclj-update $filepath
+        else
+            sleep .1
+        fi
+        last="$now"
+    done &>/dev/null &
+    pid=$!
+fi
+echo $pid > $root/update.pid
+trap "kill $pid &>/dev/null || true" EXIT
+
+cd $root
+npx shadow-cljs watch :app

@@ -1,6 +1,6 @@
 #!/usr/bin/env runclj
-^{:runclj {:lein [[org.clojure/clojure "1.10.1"]
-                  [org.clojure/clojurescript "1.10.764"]]}}
+^{:runclj {:deps []}}
+
 (ns macros
   (:require-macros [macros :refer [twice]]))
 
@@ -9,6 +9,6 @@
   `(do ~@forms
        ~@forms))
 
-(defn -main
+(defn main
   []
   (twice (println "hi!")))

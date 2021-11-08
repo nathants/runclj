@@ -1,9 +1,7 @@
 #!/usr/bin/env runclj
-^{:runclj {:npm [[source-map-support "0.5.19"]
-                 [prompt "1.0.0"]]
-           :lein [[org.clojure/clojure "1.10.1"]
-                  [org.clojure/core.async "1.2.603"]
-                  [org.clojure/clojurescript "1.10.764"]]}}
+^{:runclj {:npm [[prompt "1.2.0"]]
+           :deps []}}
+
 (ns shell
   (:require [clojure.string :as s]
             [clojure.pprint :as pp]
@@ -35,7 +33,7 @@
                    (put! chan (first (vals (js->clj res))))))
     chan))
 
-(defn -main
+(defn main
   [& args]
   (go
     (pr (<! (run println "echo 1; echo 2; echo args:" args)))

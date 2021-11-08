@@ -3,72 +3,36 @@ set -euo pipefail
 filepath=$1
 shift
 root=$(runclj-root $filepath)
+ns=$(runclj-meta $filepath :ns | tr '-' '_')
 
 build() {
     echo :root $root/ >&2
-    if ! runclj-auto-status $filepath &>/dev/null && [ ! -z "${clean:-}" ]; then
-        echo :cleaned >&2
-        rm -rf "$root"
-    fi
     source_hash=$(runclj-hash $filepath)
     compiled_hash=$(cat $root/hash 2>/dev/null || echo '')
     if [ ! -z "${usecached:-}" ] || [ "$source_hash" == "$compiled_hash" ]; then
         echo :cached >&2
-    elif runclj-auto-status $filepath &>/dev/null; then
-        rm -f $root/release.js*
-        echo :cljs-auto >&2
-        runclj-auto-wait "$filepath"
     else
-        rm -f $root/release.js*
         echo :cljs-once >&2
         runclj-once $filepath
     fi
     echo :stdout >&2
-    mkdir -p $root/out/
-    touch $root/out/dev.js
-    mv $root/out/dev.js $root/out/dev.js.tmp
-    cat $root/out/dev.js.tmp | sed -r "s:path\.resolve\([^\)]+\):'$root':" > $root/out/dev.js
-    rm $root/out/dev.js.tmp
 }
 
 browser-mode() {
     build
     file_root=$(dirname $(realpath $filepath))
     runclj-meta $filepath :static | while read static; do
-        cp -fv $file_root/$static $root
+        cp -fv $file_root/$static $root/public
     done
-    orig=$(pwd)
-    cd $root
-    if [ "${browser:-}" != n ]; then
-        runclj-serve &
-        trap "kill $!" EXIT
-        if [ -n "${callback:-}" ]; then
-            (
-                cd $orig
-                set +e
-                bash -c "$callback"
-                echo exited: $?
-            )
-        else
-            wait
-        fi
-    fi
+    runclj-serve $filepath
 }
 
 server-mode() {
     build
-    if ls $root/release.js &>/dev/null; then
-        node $root/release.js "$@"
-    else
-        node $root/dev.js "$@"
-    fi
+    node --trace-uncaught --enable-source-maps $root/public/core.js "$@"
 }
 
 mkdir -p $root
-touch $root/compiler.log
-tail -F $root/compiler.log &
-pid=$!
-trap "kill $pid" EXIT
 
 if runclj-meta $filepath :browser-mode; then
     browser-mode
