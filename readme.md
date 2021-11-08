@@ -90,19 +90,3 @@ if your project grows too large for a single file, copy the generated shadow-clj
 - `runclj program.cljs`
 
 - `cp -r .shadow-cljs/program.cljs program`
-
-- `tree program`
-
-  ```
->> tree
-
-├── package.json
-├── package-lock.json
-├── public
-│   ├── core.js
-│   ├── index.html
-├── shadow-cljs.edn
-└── src
-    └── main
-        └── client.cljs
-  ```
