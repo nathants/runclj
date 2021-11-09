@@ -8,7 +8,7 @@ kill $(cat $root/update.pid &>/dev/null) &>/dev/null || true
 
 # using entr, call `runclj-update $filepath` whenever $filepath is updated
 if which entr &>/dev/null; then
-    ls $filepath | entr -r runclj-update $filepath &>/dev/null &
+    ls $filepath | entr -r runclj-update $filepath &
     pid=$!
 
 # using stat in a loop, call `runclj-update $filepath` whenever $filepath is updated
@@ -23,7 +23,7 @@ else
             sleep .1
         fi
         last="$now"
-    done &>/dev/null &
+    done &
     pid=$!
 fi
 echo $pid > $root/update.pid
