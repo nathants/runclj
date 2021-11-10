@@ -12,7 +12,8 @@ cat <<EOF
   "version": "0.0.1",
   "private": true,
   "devDependencies": {
-    "shadow-cljs": "2.16.0"
+    "shadow-cljs": "^2",
+    "http-server": "^14"
   },
   "dependencies": ${npm}
 }

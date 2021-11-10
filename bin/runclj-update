@@ -11,11 +11,8 @@ else
     ns=$(cat $filepath | grep -E ' *\(ns ' | awk '{print $2}')
     cat $filepath > $src/main/$ns.cljs
 fi
-if [ ! -d $root/node_modules/shadow-cljs ]; then (
+if [ ! -d $root/node_modules/shadow-cljs ] || [ ! -d $root/node_modules/http-server ]; then
     cd $root
-    npm i --save-dev shadow-cljs
-) fi
-if [ ! -d $root/node_modules/http-server ]; then (
-    cd $root
-    npm i --save-dev http-server
-) fi
+    npm install
+    yes | npx shadow-cljs compile :app
+fi
