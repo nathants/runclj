@@ -29,10 +29,10 @@ cat <<EOF
  :nrepl {:port 3333}
  :dev-http {8000 "public"}
  :builds {:app {:target :browser
-                :output-dir "public"
+                :output-dir "public/js"
                 :js-options {:js-provider :shadow}
                 :compiler-options {:optimizations :simple}
-                :modules {:core {:init-fn ${ns}/main}}}}}
+                :modules {:main {:init-fn ${ns}/main}}}}}
 EOF
 }
 
@@ -44,7 +44,7 @@ cat <<EOF
  :dependencies [$deps]
  :nrepl {:port 3333}
  :builds {:app {:target :node-script
-                :output-to "public/core.js"
+                :output-to "public/main.js"
                 :output-dir "public"
                 :js-options {:js-provider :shadow}
                 :compiler-options {:optimizations :simple}
@@ -62,7 +62,7 @@ cat <<EOF
     </head>
     <body>
         <div id="app"></div>
-        <script src="core.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/main.js" type="text/javascript" charset="utf-8"></script>
     </body>
 </html>
 EOF

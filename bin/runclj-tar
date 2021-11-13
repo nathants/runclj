@@ -23,4 +23,4 @@ tar cf - $(paths_that_exist \
                 $root/hash \
                 $root/node_modules \
                 $root/public/*.html \
-                $root/public/*.js)
+                $root/public/js/*.js)

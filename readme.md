@@ -81,7 +81,7 @@ or run manually:
 
 - browser: `cd .shadow-cljs/program.cljs/public && python3 -m http.server`
 
-- server: `cd .shadow-cljs/program.cljs/ && node public/core.js`
+- server: `cd .shadow-cljs/program.cljs/ && node public/main.js`
 
 ## outgrowing runclj
 

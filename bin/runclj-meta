@@ -1,2 +1,2 @@
 #!/bin/bash
-node $(dirname $(realpath $0))/.shadow-cljs/runclj-meta.cljs/public/core.js "$@"
+node $(dirname $(realpath $0))/.shadow-cljs/runclj-meta.cljs/public/main.js "$@"

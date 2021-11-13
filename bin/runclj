@@ -29,7 +29,7 @@ browser-mode() {
 
 server-mode() {
     build
-    node --trace-uncaught --enable-source-maps $root/public/core.js "$@"
+    node --trace-uncaught --enable-source-maps $root/public/main.js "$@"
 }
 
 mkdir -p $root
