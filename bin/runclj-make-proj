@@ -31,7 +31,6 @@ cat <<EOF
  :builds {:app {:target :browser
                 :output-dir "public/js"
                 :js-options {:js-provider :shadow}
-                :compiler-options {:optimizations :simple}
                 :modules {:main {:init-fn ${ns}/main}}}}}
 EOF
 }
