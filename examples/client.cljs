@@ -77,7 +77,7 @@
    ["(.*)" component-not-found]])
 
 (defn ^:dev/after-load main []
-  (bide/start! (bide/router router) {:default component-home
+  (bide/start! (bide/router router) {:default "/"
                                      :on-navigate #(swap! state assoc :page %)
                                      :html5? false})
   (reagent.dom/render [component-root] (js/document.getElementById "app")))
