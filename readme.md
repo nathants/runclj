@@ -90,3 +90,5 @@ if your project grows too large for a single file, copy the generated shadow-clj
 - `runclj program.cljs`
 
 - `cp -r .shadow-cljs/program.cljs program`
+
+alternatively lift and shift to a project template like [new-gocljs](https://github.com/nathants/new-gocljs).
