@@ -13,6 +13,6 @@ else
 fi
 if [ ! -d $root/node_modules/shadow-cljs ]; then
     cd $root
-    npm install
-    yes | npx shadow-cljs compile :app
+    npm install shadow-cljs --save-dev
+    npx shadow-cljs compile :app
 fi
