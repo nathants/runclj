@@ -1,5 +1,5 @@
 #!/usr/bin/env runclj
-^{:runclj {:npm [[prompt "1.2.0"]]
+^{:runclj {:npm [[prompt "1.3.0"]]
            :deps []}}
 
 (ns shell
