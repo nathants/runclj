@@ -92,3 +92,4 @@ if your project grows too large for a single file, copy the generated shadow-clj
 - `cp -r .shadow-cljs/program.cljs program`
 
 alternatively lift and shift to a project template like [aws-gocljs](https://github.com/nathants/aws-gocljs).
+
